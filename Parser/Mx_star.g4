@@ -46,16 +46,16 @@ classDef
       ';'
      ;
 
-
 funcDef
     : (type| Void) Identifier '(' ( parameterList)? ')' suite
     ;
 
+//suite
 suite : '{' statement* '}';
 
+//stmt
 statement
-    : suite                                                 #blockStmt
-    | varDef                                                #vardefStmt
+    : varDef                                                #vardefStmt
     | If '(' expression ')' trueStmt=statement 
         (Else falseStmt=statement)?                         #ifStmt
     | While '(' expression ')' statement                    #whileStmt
@@ -64,86 +64,71 @@ statement
         step = expression? ')'
         statement                                           #forStmt
     | Return expression? ';'                                #returnStmt
-    | expression ';'                                        #pureExprStmt
+    | Break ';'                                             #breakStmt
+    | Continue ';'                                          #continueStmt
+    | expression ';'                                        #exprStmt
+    | suite                                                 #suiteStmt
     | ';'                                                   #emptyStmt
     ;
 
+//expr
+// <assoc=right> combine from right
 expression
-    : primary                                               #atomExpr
-    | expression op=('+' | '-') expression                  #binaryExpr
-    | expression op=('==' | '!=' ) expression               #binaryExpr
-    | <assoc=right> expression '=' expression               #assignExpr
-    ;
+        : Identifier												        #identifierExpr
+    	| This													            #thisExpr
+    	| constant												            #constExpr
+    	| '(' expression ')'											    #parenExpr
+    	| expression '.' Identifier									        #memberExpr
+    	| array = expression '[' cnt = expression ']'						#arrayExpr
+    	| expression '(' (expression (',' expression)*)? ')'		        #funcExpr
+    	| <assoc = right> New creator							            #newExpr
+    	| expression op = ('++' | '--')								        #postfixExpr
+    	| <assoc = right> op = ('++' | '--') expression				        #prefixExpr
+    	| <assoc = right> op = ('+' | '-') expression					    #prefixExpr
+    	| <assoc = right> op = ('~' | '!') expression					    #prefixExpr
+    	| left = expression bop = ('*' | '/' | '%') right = expression			#binaryExpr
+    	| left = expression bop = ('+' | '-') right = expression				#binaryExpr
+    	| left = expression bop = ('>>' | '<<') right = expression				#binaryExpr
+    	| left = expression bop = ('<' | '>' | '<=' | '>=') right = expression	#binaryExpr
+    	| left = expression bop = ('!=' | '==') right = expression				#binaryExpr
+    	| left = expression bop = '&' right = expression						#binaryExpr
+    	| left = expression bop = '^' right = expression						#binaryExpr
+    	| left = expression bop = '|' right = expression						#binaryExpr
+    	| left = expression bop = '&&' right = expression						#binaryExpr
+    	| left = expression bop = '||' right = expression						#binaryExpr
+    	| <assoc = right> left = expression bop = '=' right = expression		#binaryExpr
+    	;
 
-primary
-    : '(' expression ')'
-    | Identifier 
-    | literal 
-    ;
-
-literal
-    : DecimalInteger
-    ;
-
-/*
-Int : 'int';
-If : 'if';
-Else : 'else';
-Return : 'return';
-
-LeftParen : '(';
-RightParen : ')';
-LeftBracket : '[';
-RightBracket : ']';
-LeftBrace : '{';
-RightBrace : '}';
-
-Less : '<';
-LessEqual : '<=';
-Greater : '>';
-GreaterEqual : '>=';
-LeftShift : '<<';
-RightShift : '>>';
-
-Plus : '+';
-Minus : '-';
-
-And : '&';
-Or : '|';
-AndAnd : '&&';
-OrOr : '||';
-Caret : '^';
-Not : '!';
-Tilde : '~';
-
-Question : '?';
-Colon : ':';
-Semi : ';';
-Comma : ',';
-
-Assign : '=';
-Equal : '==';
-NotEqual : '!=';
-*/
+//creator
+creator
+    : (Bool | Int | String | Identifier) ('[' expression ']')* ('[' ']')+ ('[' expression ']')+	    #errorCreator
+    | (Bool | Int | String | Identifier) ('[' expression ']')+ ('[' ']')*					        #arrayCreator
+    | (Bool | Int | String | Identifier) ('(' ')')?								                    #nonArrayCreator;
 
 //const
+constant
+    : Boolconst
+    | DecimalInteger
+    | Stringconst
+    | Nullconst
+    ;
+
 DecimalInteger
     : [1-9] [0-9]*
     | '0'
     ;
-
 Stringconst
     : '"'
     (~["\\\r\n] | '\\' ["n\\])*
       '"'
     ;
-
 Boolconst
     : 'true'
     | 'false'
     ;
-
-
+Nullconst
+    : 'null'
+    ;
 
 //whitespace
 Whitespace
@@ -174,7 +159,6 @@ Identifier
     : [a-zA-Z] [a-zA-Z_0-9]*
     ;
 
-
 //reserved keyword
 Bool: 'bool';
 Int: 'int';
@@ -190,4 +174,3 @@ Return: 'return';
 New: 'new';
 Class: 'class';
 This: 'this';
-//
