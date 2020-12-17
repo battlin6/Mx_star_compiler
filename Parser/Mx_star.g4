@@ -1,6 +1,6 @@
 grammar Mx_star;
 
-program: 'int main()' suite EOF;
+program: def*;
 
 //var
 varList
@@ -56,7 +56,7 @@ suite : '{' statement* '}';
 //stmt
 statement
     : varDef                                                #vardefStmt
-    | If '(' expression ')' trueStmt=statement 
+    | If '(' expression ')' trueStmt=statement
         (Else falseStmt=statement)?                         #ifStmt
     | While '(' expression ')' statement                    #whileStmt
     | For '(' init = expression? ';'
