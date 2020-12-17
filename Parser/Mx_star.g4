@@ -2,15 +2,67 @@ grammar Mx_star;
 
 program: 'int main()' suite EOF;
 
-varDef : Int Identifier ('=' expression)? ';';
+//var
+varList
+    : var (',' var)*
+    ;
+var
+    : Identifier ('=' expression)?
+    ;
+
+//param
+parameterList
+    : parameter (',' parameter)*
+    ;
+parameter
+    : type Identifier
+    ;
+
+//type
+type
+    : type '[' ']'
+    | Bool
+    | Int
+    | String
+    | Identifier
+    ;
+
+//definition
+def
+    : varDef
+    | classDef
+    | funcDef
+    ;
+
+varDef
+    : type varList ';'
+    ;
+
+classDef
+    : Class Identifier
+      '{'
+      (varDef | funcDef | Identifier '(' parameterList? ')' suite)*
+      '}'
+      ';'
+     ;
+
+
+funcDef
+    : (type| Void) Identifier '(' ( parameterList)? ')' suite
+    ;
 
 suite : '{' statement* '}';
 
 statement
-    : suite                                                 #block
+    : suite                                                 #blockStmt
     | varDef                                                #vardefStmt
     | If '(' expression ')' trueStmt=statement 
         (Else falseStmt=statement)?                         #ifStmt
+    | While '(' expression ')' statement                    #whileStmt
+    | For '(' init = expression? ';'
+        cond = expression? ';'
+        step = expression? ')'
+        statement                                           #forStmt
     | Return expression? ';'                                #returnStmt
     | expression ';'                                        #pureExprStmt
     | ';'                                                   #emptyStmt
@@ -33,6 +85,7 @@ literal
     : DecimalInteger
     ;
 
+/*
 Int : 'int';
 If : 'if';
 Else : 'else';
@@ -71,21 +124,34 @@ Comma : ',';
 Assign : '=';
 Equal : '==';
 NotEqual : '!=';
+*/
 
-Identifier
-    : [a-zA-Z] [a-zA-Z_0-9]*
-    ;
-
+//const
 DecimalInteger
     : [1-9] [0-9]*
     | '0'
     ;
 
+Stringconst
+    : '"'
+    (~["\\\r\n] | '\\' ["n\\])*
+      '"'
+    ;
+
+Boolconst
+    : 'true'
+    | 'false'
+    ;
+
+
+
+//whitespace
 Whitespace
     :   [ \t]+
         -> skip
     ;
 
+//newline
 Newline
     :   (   '\r' '\n'?
         |   '\n'
@@ -93,12 +159,35 @@ Newline
         -> skip
     ;
 
+//comment
 BlockComment
     :   '/*' .*? '*/'
         -> skip
     ;
-
 LineComment
     :   '//' ~[\r\n]*
         -> skip
     ;
+
+//identifier
+Identifier
+    : [a-zA-Z] [a-zA-Z_0-9]*
+    ;
+
+
+//reserved keyword
+Bool: 'bool';
+Int: 'int';
+String: 'string';
+Void: 'void';
+If: 'if';
+Else: 'else';
+For: 'for';
+While: 'while';
+Break: 'break';
+Continue: 'continue';
+Return: 'return';
+New: 'new';
+Class: 'class';
+This: 'this';
+//
