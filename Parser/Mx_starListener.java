@@ -129,6 +129,18 @@ public interface Mx_starListener extends ParseTreeListener {
 	 */
 	void exitVardefStmt(Mx_starParser.VardefStmtContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code exprStmt}
+	 * labeled alternative in {@link Mx_starParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterExprStmt(Mx_starParser.ExprStmtContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code exprStmt}
+	 * labeled alternative in {@link Mx_starParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitExprStmt(Mx_starParser.ExprStmtContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code ifStmt}
 	 * labeled alternative in {@link Mx_starParser#statement}.
 	 * @param ctx the parse tree
@@ -200,18 +212,6 @@ public interface Mx_starListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitContinueStmt(Mx_starParser.ContinueStmtContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code exprStmt}
-	 * labeled alternative in {@link Mx_starParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterExprStmt(Mx_starParser.ExprStmtContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code exprStmt}
-	 * labeled alternative in {@link Mx_starParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitExprStmt(Mx_starParser.ExprStmtContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code suiteStmt}
 	 * labeled alternative in {@link Mx_starParser#statement}.

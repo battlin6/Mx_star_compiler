@@ -56,6 +56,7 @@ suite : '{' statement* '}';
 //stmt
 statement
     : varDef                                                #vardefStmt
+    | expression ';'                                        #exprStmt
     | If '(' expression ')' trueStmt=statement
         (Else falseStmt=statement)?                         #ifStmt
     | While '(' expression ')' statement                    #whileStmt
@@ -66,7 +67,6 @@ statement
     | Return expression? ';'                                #returnStmt
     | Break ';'                                             #breakStmt
     | Continue ';'                                          #continueStmt
-    | expression ';'                                        #exprStmt
     | suite                                                 #suiteStmt
     | ';'                                                   #emptyStmt
     ;
@@ -154,11 +154,6 @@ LineComment
         -> skip
     ;
 
-//identifier
-Identifier
-    : [a-zA-Z] [a-zA-Z_0-9]*
-    ;
-
 //reserved keyword
 Bool: 'bool';
 Int: 'int';
@@ -174,3 +169,9 @@ Return: 'return';
 New: 'new';
 Class: 'class';
 This: 'this';
+
+
+//identifier
+Identifier
+    : [a-zA-Z] [a-zA-Z_0-9]*
+    ;

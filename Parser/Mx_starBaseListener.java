@@ -159,6 +159,18 @@ public class Mx_starBaseListener implements Mx_starListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterExprStmt(Mx_starParser.ExprStmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExprStmt(Mx_starParser.ExprStmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterIfStmt(Mx_starParser.IfStmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -226,18 +238,6 @@ public class Mx_starBaseListener implements Mx_starListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitContinueStmt(Mx_starParser.ContinueStmtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterExprStmt(Mx_starParser.ExprStmtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitExprStmt(Mx_starParser.ExprStmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

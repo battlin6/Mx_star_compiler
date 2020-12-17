@@ -83,6 +83,13 @@ public interface Mx_starVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitVardefStmt(Mx_starParser.VardefStmtContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code exprStmt}
+	 * labeled alternative in {@link Mx_starParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprStmt(Mx_starParser.ExprStmtContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code ifStmt}
 	 * labeled alternative in {@link Mx_starParser#statement}.
 	 * @param ctx the parse tree
@@ -124,13 +131,6 @@ public interface Mx_starVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitContinueStmt(Mx_starParser.ContinueStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code exprStmt}
-	 * labeled alternative in {@link Mx_starParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExprStmt(Mx_starParser.ExprStmtContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code suiteStmt}
 	 * labeled alternative in {@link Mx_starParser#statement}.
