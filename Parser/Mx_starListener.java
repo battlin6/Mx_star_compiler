@@ -1,4 +1,4 @@
-// Generated from D:/Project/Clion Project/Mx_star_compiler/Parser\Mx_star.g4 by ANTLR 4.8
+// Generated from D:/Project/IDEA Project/Mx_star_compiler/Parser\Mx_star.g4 by ANTLR 4.9.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
