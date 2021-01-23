@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-public class Mx_starBaseListener implements Mx_starListener {
+public final class Mx_starBaseListener implements Mx_starListener {
 	/**
 	 * {@inheritDoc}
 	 *
