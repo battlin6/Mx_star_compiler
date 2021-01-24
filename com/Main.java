@@ -17,7 +17,7 @@ public class Main {
         ErrorHandler errorHandler = new ErrorHandler();
 
         String fileName;
-        fileName = "test.mx";
+        fileName = "test.mx.mx";
 
         InputStream inputStream;
         CharStream input;

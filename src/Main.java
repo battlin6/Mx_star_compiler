@@ -1,61 +1,49 @@
-import AST.ASTNode;
-import Frontend.ASTBuilder;
-import Frontend.ClassScanner;
-import Frontend.FunctionScanner;
-import Frontend.SemanticAnalyzer;
-import Parser.MxstarErrorListener;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.*;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
-import Parser.MxstarLexer;
-import Parser.MxstarParser;
-
-import Symbol.GlobalScope;
+import parser.*;
+import AST.*;
+import utility.*;
+import SemanticChecker.*;
 
 public class Main {
-    private static CharStream readCode() throws Exception{
-        String inputFile = "code.mx";
-//        String inputFile = "test\\test3.m";
-        InputStream is = new FileInputStream(inputFile);
-        return CharStreams.fromStream(is);
-    }
-
-    private static ParseTree buildCST(CharStream input) {
-        MxstarLexer lexer = new MxstarLexer(input);
-        lexer.addErrorListener(new MxstarErrorListener());
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        MxstarParser parser = new MxstarParser(tokens);
-        parser.addErrorListener(new MxstarErrorListener());
-        return parser.program();
-    }
-
-    private static void semanticAnalysis(ASTNode ast) {
-        GlobalScope globalScope = new GlobalScope();
-        ast.accept(new ClassScanner(globalScope));
-        ast.accept(new FunctionScanner(globalScope));
-        ast.accept(new SemanticAnalyzer(globalScope));
-    }
-
-    private static ASTNode buildAST(ParseTree tree) {
-        ASTBuilder builder = new ASTBuilder();
-        return builder.visit(tree);
-    }
-
-    public static void main(String[] args) {
-        try{
-            CharStream input = readCode();
-            ParseTree tree = buildCST(input);
-            ASTNode ast = buildAST(tree);
-            semanticAnalysis(ast);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            java.lang.System.exit(1);
-        }
-    }
+	public static void main(String[] args) throws IOException {
+		ErrorReminder errorReminder = new ErrorReminder();
+		InputStream IS = System.in;
+		//InputStream IS = new FileInputStream("code.Mx");
+		CharStream AIS = CharStreams.fromStream(IS);
+      	
+		//System.err.println("lexer------------------");
+		MxstarLexer lexer = new MxstarLexer(AIS);
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(new MxstarErrorListener(errorReminder));
+		
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		/*
+		System.out.println("Get tokens.");
+		tokens.fill();
+		for(Token token : tokens.getTokens()) {
+			System.out.println(token.getType() + " " + token.getText());
+		}*/
+		
+		//System.err.println("parser------------------");
+		MxstarParser parser = new MxstarParser(tokens);
+		parser.removeErrorListeners();
+		parser.addErrorListener(new MxstarErrorListener(errorReminder));
+		
+		//System.err.println("Building AST------------");
+		ASTBuilder ast = new ASTBuilder(errorReminder);
+		ProgramNode root = (ProgramNode) ast.visit(parser.program());
+		
+		//System.err.println("Semantic checking--------");
+		SemanticChecker checker = new SemanticChecker(errorReminder);
+		checker.visit(root);
+		//System.err.println("Finished.");
+		
+		System.exit(errorReminder.count());
+		//if (errorReminder.hasError()) System.exit(1);
+	}
 }

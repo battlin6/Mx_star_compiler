@@ -1,21 +1,20 @@
 package AST;
 
-import Utils.Position;
+import utility.Location;
 
-public class ExprStmtNode extends Stmt {
-    private Expr expression;
-
-    public ExprStmtNode(Expr expression, Position position) {
-        super(position);
-        this.expression = expression;
-    }
-
-    public Expr getExpression() {
-        return expression;
-    }
-
-    @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visit(this);
-    }
+public class ExprStmtNode extends StmtNode {
+	private ExprNode expr;
+	
+	public ExprStmtNode(Location loc, ExprNode expr) {
+		super(loc);
+		this.expr = expr;
+	}
+	
+	public ExprNode getExpr() {
+		return expr;
+	}
+	
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

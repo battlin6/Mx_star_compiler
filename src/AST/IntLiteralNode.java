@@ -1,17 +1,20 @@
 package AST;
 
-import Utils.Position;
+import utility.Location;
 
-public class IntLiteralNode extends ConstExpr {
-    private Integer value;
-
-    public IntLiteralNode(Integer value, Position position) {
-        super(position);
-        this.value = value;
-    }
-
-    @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visit(this);
-    }
+public class IntLiteralNode extends LiteralExprNode {
+	private long value;
+	
+	public IntLiteralNode(Location loc, long value) {
+		super(loc);
+		this.value = value;
+	}
+	
+	public long getValue() {
+		return value;
+	}
+	
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

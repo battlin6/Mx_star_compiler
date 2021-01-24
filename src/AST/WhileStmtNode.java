@@ -1,27 +1,26 @@
 package AST;
 
-import Utils.Position;
+import utility.Location;
 
-public class WhileStmtNode extends Stmt {
-    private Expr condition;
-    private Stmt statement;
-
-    public WhileStmtNode(Expr condition, Stmt statement, Position position) {
-        super(position);
-        this.condition = condition;
-        this.statement = statement;
-    }
-
-    public Expr getCondition() {
-        return condition;
-    }
-
-    public Stmt getStatement() {
-        return statement;
-    }
-
-    @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visit(this);
-    }
+public class WhileStmtNode extends StmtNode {
+	private ExprNode expr;
+	private StmtNode stmt;
+	
+	public WhileStmtNode(Location loc, ExprNode expr, StmtNode stmt) {
+		super(loc);
+		this.expr = expr;
+		this.stmt = stmt;
+	}
+	
+	public ExprNode getExpr() {
+		return expr;
+	}
+	
+	public StmtNode getStmt() {
+		return stmt;
+	}
+	
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

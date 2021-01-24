@@ -1,21 +1,20 @@
 package AST;
 
-import Utils.Position;
+import utility.Location;
 
-public class VarExprNode extends PrimaryExpr {
-    private String identifier;
-
-    public VarExprNode(String identifier, Position position) {
-        super(position);
-        this.identifier = identifier;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visit(this);
-    }
+public class VarExprNode extends ExprNode {
+	private String identifier;
+	
+	public VarExprNode(Location loc, String identifier) {
+		super(loc);
+		this.identifier = identifier;
+	}	
+	
+	public String getIdentifier() {
+		return identifier;
+	}
+	
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

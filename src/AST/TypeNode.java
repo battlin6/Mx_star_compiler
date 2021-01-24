@@ -1,31 +1,21 @@
 package AST;
 
-import Utils.Position;
+import utility.Location;
 
-public class TypeNode extends ASTNode{
-    private String type;
-    private int arrayDimension;
-
-    public TypeNode(String type, int arrayDimension, Position position) {
-        super(position);
-        this.type = type;
-        this.arrayDimension = arrayDimension;
-    }
-
-    public void setDim(int dim) {
-        arrayDimension = dim;
-    }
-
-    public int getDim() {
-        return arrayDimension;
-    }
-
-    public String getIdentifier(){
-        return type;
-    }
-
-    @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visit(this);
-    }
+public abstract class TypeNode extends ASTNode {
+	protected String identifier;
+	
+	public TypeNode(Location loc, String identifier) {
+		super(loc);
+		this.identifier = identifier;
+	}
+	
+	public abstract String toString();
+	
+	public String typeString() {
+		return identifier;
+	}
+	
+	public abstract void accept(ASTVisitor visitor);
 }
+

@@ -1,239 +1,153 @@
 grammar Mxstar;
 
 @header {
-package Parser;
+	package parser;
 }
 
-program
-    :   programFragment*
+program 
+	: def* EOF
+	;
+  
+def
+	: varDefList
+	| functDef
+	| classDef
+	;
+
+classDef
+	: 'class' Identifier '{' (varDefList | functDef | constructorDef)* '}' ';'
+	;
+
+functDef
+	: type Identifier '(' paraList ')' '{' stmt* '}'
     ;
 
-programFragment
-    :   functionDeclaration
-    |   classDeclaration
-    |   varDeclaration
-    ;
+varDefList
+	: type varDef (',' varDef)* ';'
+	;
 
-classDeclaration
-    :   'class' Identifier '{' (varDeclaration | functionDeclaration | constructorDeclaration)* '}' ';'
-    ;
+varDef
+	: Identifier ('=' expr)?
+	;
 
-constructorDeclaration
-    :   Identifier '(' ')' compoundStatement
-    ;
+paraList
+	: 
+	| para (',' para)*
+	;
 
-varDeclaration
-    :   type identifierList ';'
-    |   type Identifier '=' expression ';'
-    ;
+para
+	: type Identifier ('=' expr)?
+	;
 
-identifierList
-    :   Identifier  (',' Identifier)*
-    ;
-
-functionDeclaration
-    :   funcType declarator compoundStatement
-    ;
-
-funcType
-    :   type
-    |   Void
-    ;
-
-declarator
-    :  Identifier '(' parameterDeclarationList? ')'
-    ;
-
-parameterDeclarationList
-    :   parameterDeclaration
-    |   parameterDeclarationList ',' parameterDeclaration
-    ;
-
-parameterDeclaration
-    :   type Identifier
-    ;
-
-compoundStatement
-    :   '{' statement* '}'
-    ;
-
-statement
-    :   compoundStatement           #CompoundStmt
-    |   varDeclaration              #VarDeclStmt
-    |   expressionStatement         #ExprStmt
-    |   selectionStatement          #SelectionStmt
-    |   iterationStatement          #IterationStmt
-    |   jumpStatement               #JumpStmt
-    |   ';'                         #EmptyStmt
-    ;
-
-expressionStatement
-    :   expression ';'
-    ;
-
-selectionStatement
-    :   'if' '(' expression ')' opt1=statement ('else' opt2=statement)?
-    ;
-
-iterationStatement
-    :   While '(' expression ')' statement      #WhileStmt
-    |   For '(' forCondition ')' statement      #ForStmt
-    ;
-
-forCondition
-    :   init=expression? ';' cond=expression? ';' step=expression?
-    ;
-
-jumpStatement
-    :   'return' expression? ';'    #ReturnStmt
-    |   'break' ';'                 #BreakStmt
-    |   'continue' ';'              #ContinueStmt
-    ;
-
-primaryExpression
-    :   constantExpression      #ConstExpr
-    |   This                    #ThisExpr
-    |   Identifier              #VarExpr
-    ;
-
-constantExpression
-    :   True                    #BoolExpr
-    |   False                   #BoolExpr
-    |   Null                    #NullExpr
-    |   IntegerLiteral          #IntegerLiteral
-    |   StringLiteral           #StringLiteral
-    ;
-
-
-expression
-    :   primaryExpression                                                       #PrimaryExpr
-    |   '(' expression ')'                                                      #ParenthesesExpr
-    |   expression '.' Identifier                                               #FieldExpr
-    |   expression '(' parameterList? ')'                                       #FuncCallExpr
-    |   'new' newSpecifier                                                      #NewExpr
-    |   src1=expression '[' src2=expression ']'                                 #SubscriptExpr
-    |   expression op=('++' | '--')                                             #PostfixExpr
-    |   op=('++' | '--') expression                                             #UnaryExpr
-    |   op=('+' | '-' | '~' | '!') expression                                   #UnaryExpr
-    |   src1=expression op=('*' | '/' | '%') src2=expression                    #BinaryExpr
-    |   src1=expression op=('+' | '-') src2=expression                          #BinaryExpr
-    |   src1=expression op=('<<' | '>>') src2=expression                        #BinaryExpr
-    |   src1=expression op=('<' | '>' | '<=' | '>=') src2=expression            #BinaryExpr
-    |   src1=expression op=('==' | '!=') src2=expression                        #BinaryExpr
-    |   src1=expression op='&' src2=expression                                  #BinaryExpr
-    |   src1=expression op='^' src2=expression                                  #BinaryExpr
-    |   src1=expression op='|' src2=expression                                  #BinaryExpr
-    |   src1=expression op='&&' src2=expression                                 #BinaryExpr
-    |   src1=expression op='||' src2=expression                                 #BinaryExpr
-    |   <assoc=right> src1=expression '?' src2=expression ':' src3=expression   #ConditionalExpr
-    |   <assoc=right> src1=expression op='=' src2=expression                       #BinaryExpr
-    ;
-
-parameterList
-    :   expression
-    |   parameterList ',' expression
-    ;
-
-//unaryOperator
-//    :   '+'
-//    |   '-'
-//    |   '~'
-//    |   '!'
-//    ;
-
-newSpecifier
-    :   primaryType parentheses
-    |   primaryType ('[' expression ']')* ('[' ']')+ ('[' errSrc=expression ']')+
-    |   primaryType ('[' expression ']')+ ('[' ']')*
-    |   primaryType
-    ;
-
-parentheses
-    : '(' ')'
-    ;
+constructorDef
+	: Identifier '(' ')' '{' stmt* '}'
+	;
 
 type
-    :   primaryType
-    |   type '[' ']'
+	: varType
+	| arrayType
+	;
+
+arrayType
+	: varType ('[' ']')+
+	;
+
+varType
+	: primType
+	| Identifier
+	;
+
+primType
+    : 'bool' | 'int' | 'string' | 'void'
     ;
 
-primaryType
-    :   Bool
-    |   Int
-    |   String
-    |   Identifier
+block
+	: '{' stmt* '}'
+	;
+
+stmt
+	: block                                    # blockStmt
+	| varDefList                               # varDefStmt 
+	| 'if' '(' expr? ')' stmt ('else' stmt)?   # ifStmt
+	| 'for' '(' init = expr? ';'  
+			  cond = expr? ';'
+			  step = expr? 
+		  ')'
+	  stmt                                     # forStmt
+	| 'while' '(' expr? ')' stmt               # whileStmt   
+	| 'return' expr? ';'                       # returnStmt
+	| 'break' ';'                              # breakStmt
+	| 'continue' ';'                           # continueStmt
+	| expr ';'                                 # exprStmt
+	| ';'                                      # brankStmt
+	;
+	
+expr
+ 	: '(' expr ')'                                           # bracketExpr
+ 	|'this'                                                  # thisExpr 
+	| literal                                                # literalExpr       
+	| Identifier                                             # varExpr
+	| 'new' creator                                          # creatorExpr            
+	| expr '.' Identifier   							     # memberExpr                  
+	| expr '[' expr ']'               		   	             # arrayExpr                                
+	| expr '(' exprList? ')'                                 # functExpr              
+	| expr op = ('++' | '--')                                # suffixExpr                      
+	| op = ('+' | '-') expr                                  # prefixExpr                    
+	| op = ('++' | '--') expr                                # prefixExpr                      
+	| op = ('~' | '!') expr                                  # prefixExpr                    
+	| expr op = ('*' | '/' | '%') expr                       # binaryExpr                               
+	| expr op = ('+' | '-') expr                             # binaryExpr                         
+	| expr op = ('<<' | '>>') expr                           # binaryExpr                           
+	| expr op = ('<' | '>' | '<=' | '>=') expr               # binaryExpr       
+	| expr op = ('==' | '!=') expr                           # binaryExpr        
+	| expr op = '&' expr                                     # binaryExpr     
+	| expr op = '^' expr                                     # binaryExpr     
+	| expr op = '|' expr                                     # binaryExpr     
+	| expr op = '&&' expr                                    # binaryExpr      
+	| expr op = '||' expr                                    # binaryExpr              
+	| <assoc = right> expr op = '=' expr                     # binaryExpr
+	;        
+
+exprList
+	: (expr (',' expr)*)
+	;
+
+creator
+	: varType ( ('[' ']')+ | ((('[' ']')|('[' expr ']'))* '[' ']' '[' expr ']' (('[' ']')|('[' expr ']'))*) )        # invalidCreator
+	| varType ('[' expr ']')+ ('[' ']')*                                                                             # arrayCreator
+	| varType '(' ')'                                                                                                # classCreator
+	| varType                                                                                                        # naiveCreator
+	;
+
+literal
+	: BoolLiteral   
+	| IntLiteral
+	| StringLiteral
+	| 'null'
+	;
+
+BoolLiteral 
+	: 'true' | 'false'
+	;
+
+IntLiteral 
+    : [1-9] [0-9]*
+    | '0'
     ;
 
-True : 'true';
-False : 'false';
-This : 'this';
-Null : 'null';
+StringLiteral 
+	: '"' (ESC|.)*? '"'
+	;
 
+ESC: '\\"' | '\\n' | '\\\\';
 
-Bool : 'bool';
-Int : 'int';
-Void : 'void';
-String : 'string';
+Identifier: [a-zA-Z] [a-zA-Z_0-9]* ;
 
-While : 'while';
-For : 'for';
+WS : [ \t]+  -> skip;
 
-IntegerLiteral
-    :   [0-9]+
-    ;
+NewLine: '\r' ? '\n' -> skip;
 
-StringLiteral
-    :   '"' SChar* '"'
-    ;
+LineComment : '//' ~[\r\n]* -> skip;
 
-fragment
-SChar
-    :   ~["\\\r\n]
-    |   EscapeSequence
-    ;
+BlockComment : '/*' .*? '*/' -> skip;
 
-fragment
-EscapeSequence
-    :   '\\' ["n\\]
-    ;
-
-
-Identifier
-    :   Letter
-        (   Letter
-        |   Digit
-        |   '_'
-        )*
-    ;
-
-fragment
-Letter
-    :   [a-zA-Z]
-    ;
-
-fragment
-Digit
-    :   [0-9]
-    ;
-
-Whitespace
-    :   [ \t]+
-        -> skip
-    ;
-
-Newline
-    :   (   '\r' '\n'?
-        |   '\n'
-        )
-        -> skip
-    ;
-
-BlockComment
-    :   '/*' .*? '*/'
-        -> skip
-    ;
-
-LineComment
-    :   '//' ~[\r\n]*
-        -> skip
-    ;

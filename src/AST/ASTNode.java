@@ -1,17 +1,17 @@
 package AST;
 
-import Utils.Position;
+import utility.Location;
 
-public abstract class ASTNode {
-    private Position position;
-
-    public ASTNode(Position position) {
-        this.position = position;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public abstract void accept(ASTVisitor visitor);
+abstract public class ASTNode {
+	private Location loc;
+	
+	public ASTNode(Location loc) {
+		this.loc = loc;
+	}
+	
+	public Location getLoc() {
+		return loc;
+	}
+	
+	public abstract void accept(ASTVisitor visitor);
 }

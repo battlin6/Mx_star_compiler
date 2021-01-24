@@ -1,23 +1,24 @@
 package AST;
 
-import Utils.Position;
-
-import java.util.List;
+import utility.Location; 
+import java.util.ArrayList;
 
 public class ProgramNode extends ASTNode {
-    private List<ProgramFragment> programFragments;
-
-    public ProgramNode(List<ProgramFragment> programFragments, Position position) {
-        super(position);
-        this.programFragments = programFragments;
-    }
-
-    public List<ProgramFragment> getList() {
-        return programFragments;
-    }
-
-    @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visit(this);
-    }
+	private ArrayList<DefNode> defList;
+	
+	public ProgramNode(Location loc, ArrayList<DefNode> defList) {
+		super(loc);
+		this.defList = defList;
+	}
+	
+	public void addDef(DefNode def) {
+		defList.add(def);
+	}
+	
+	public ArrayList<DefNode> getDefList() {
+		return defList;
+	}
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }
