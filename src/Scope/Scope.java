@@ -2,12 +2,15 @@
 package Scope;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import AST.VarDefNode;
 import AST.FunctDefNode;
 import AST.FunctExprNode;
 import AST.ClassDefNode;
 import AST.VarExprNode;
+import IR.Symbol.IRRegister;
 import AST.ArrayExprNode;
 import utility.ErrorReminder;
 
@@ -27,9 +30,9 @@ public interface Scope {
 	
 	public abstract Type resolveType(String identifier); 
 	
-	public abstract VarSymbol resovleVar(VarExprNode node, ErrorReminder errorReminder);
+	public abstract VarSymbol resolveVar(VarExprNode node, ErrorReminder errorReminder);
 	
-	public abstract VarSymbol resovleArray(ArrayExprNode node, ErrorReminder errorReminder);
+	public abstract VarSymbol resolveArray(ArrayExprNode node, ErrorReminder errorReminder);
 	
 	public abstract FunctSymbol resolveFunct(FunctExprNode node, ErrorReminder errorReminder);
 		

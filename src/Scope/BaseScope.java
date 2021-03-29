@@ -1,6 +1,7 @@
 package Scope;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import utility.ErrorReminder;
 import AST.ClassDefNode;
@@ -8,6 +9,7 @@ import AST.FunctDefNode;
 import AST.FunctExprNode;
 import AST.VarDefNode;
 import AST.VarExprNode;
+import IR.Symbol.IRRegister;
 import AST.TypeNode;
 import AST.ArrayExprNode;
 import AST.ArrayTypeNode;
@@ -65,7 +67,7 @@ abstract public class BaseScope implements Scope {
 			return null;
 		}
 		else {
-			VarSymbol varSymbol = new VarSymbol(identifier, type);
+			VarSymbol varSymbol = new VarSymbol(identifier, type, this);
 			this.varList.put(identifier, varSymbol);
 			return varSymbol;
 		}	
@@ -73,9 +75,9 @@ abstract public class BaseScope implements Scope {
 
 	public abstract Type resolveType(String identifier); 
 	
-	public abstract VarSymbol resovleVar(VarExprNode node, ErrorReminder errorReminder);
+	public abstract VarSymbol resolveVar(VarExprNode node, ErrorReminder errorReminder);
 	
-	public abstract VarSymbol resovleArray(ArrayExprNode node, ErrorReminder errorReminder);
+	public abstract VarSymbol resolveArray(ArrayExprNode node, ErrorReminder errorReminder);
 	
 	public abstract FunctSymbol resolveFunct(FunctExprNode node, ErrorReminder errorReminder);
 	
@@ -96,4 +98,25 @@ abstract public class BaseScope implements Scope {
 	public abstract ClassSymbol getClassScope(String identifier);
 	
 	public abstract boolean duplicateClass(String identifier);
+	
+	/*
+	//for IR
+	protected LinkedHashMap<String, IRRegister> registerList;
+	
+	@Override
+	public void addRegister(String name, IRRegister reg) {
+		if (registerList.containsKey(name)) {
+			System.err.println("error in BaseScope.addRegister");
+		}	
+		registerList.put(name, reg);
+	}
+	
+	@Override
+	public IRRegister resolveRegister(String name) {
+		if (registerList.containsKey(name)) 
+			return registerList.get(name);
+		if (parent != null)
+			return parent.resolveRegister(name);
+		return null;
+	}*/
 }
