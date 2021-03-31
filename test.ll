@@ -371,8 +371,8 @@ forCondBlock.1:
     br i1 %sle.1, label %forBodyBlock.1, label %afterForBlock.1
 
 forBodyBlock.1:
-    %i.2 = load i32, i32* %i$.0
     %c.0 = load i32**, i32*** %c$.0
+    %i.2 = load i32, i32* %i$.0
     %element$.64 = getelementptr i32*, i32** %c.0, i32 %i.2
     %element.64 = load i32*, i32** %element$.64
     %j.2 = load i32, i32* %j$.0
@@ -398,29 +398,29 @@ forCondBlock.2:
     br i1 %sle.2, label %forBodyBlock.2, label %afterForBlock.2
 
 forBodyBlock.2:
-    %i.3 = load i32, i32* %i$.0
     %c.1 = load i32**, i32*** %c$.0
+    %i.3 = load i32, i32* %i$.0
     %element$.66 = getelementptr i32*, i32** %c.1, i32 %i.3
     %element.66 = load i32*, i32** %element$.66
     %j.3 = load i32, i32* %j$.0
     %element$.67 = getelementptr i32, i32* %element.66, i32 %j.3
     %element.67 = load i32, i32* %element$.67
-    %i.4 = load i32, i32* %i$.0
     %c.2 = load i32**, i32*** %c$.0
+    %i.4 = load i32, i32* %i$.0
     %element$.68 = getelementptr i32*, i32** %c.2, i32 %i.4
     %element.68 = load i32*, i32** %element$.68
     %j.4 = load i32, i32* %j$.0
     %element$.69 = getelementptr i32, i32* %element.68, i32 %j.4
     %element.69 = load i32, i32* %element$.69
-    %i.5 = load i32, i32* %i$.0
     %a.16 = load i32**, i32*** %a$.0
+    %i.5 = load i32, i32* %i$.0
     %element$.70 = getelementptr i32*, i32** %a.16, i32 %i.5
     %element.70 = load i32*, i32** %element$.70
     %k.2 = load i32, i32* %k$.0
     %element$.71 = getelementptr i32, i32* %element.70, i32 %k.2
     %element.71 = load i32, i32* %element$.71
-    %k.3 = load i32, i32* %k$.0
     %b.16 = load i32**, i32*** %b$.0
+    %k.3 = load i32, i32* %k$.0
     %element$.72 = getelementptr i32*, i32** %b.16, i32 %k.3
     %element.72 = load i32*, i32** %element$.72
     %j.5 = load i32, i32* %j$.0

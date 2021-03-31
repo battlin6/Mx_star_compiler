@@ -9,16 +9,13 @@ import parser.*;
 import AST.*;
 import utility.*;
 import SemanticChecker.*;
-import optimize.CFGSimplifier;
-import optimize.DominatorTree;
-import optimize.SSAConstructor;
 import IR.*;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
 		ErrorReminder errorReminder = new ErrorReminder();
 		InputStream IS = System.in;
-		//InputStream IS = new FileInputStream("test/test.txt");
+		//InputStream IS = new FileInputStream("test.txt");
 		CharStream AIS = CharStreams.fromStream(IS);
 
 		//System.err.println("lexer------------------");
