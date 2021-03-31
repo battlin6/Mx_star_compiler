@@ -33,6 +33,8 @@ public class BinOpInst extends IRInst {
 		this.result = result;
 		this.left = left;
 		this.right = right;
+		left.addUse(this);
+		right.addUse(this);
 	}
 	
 	@Override
@@ -49,4 +51,37 @@ public class BinOpInst extends IRInst {
 		visitor.visit(this);	
 	}
 
+	@Override
+	public void replaceUse(IRSymbol old, IRSymbol nw) {
+		boolean flag = false;
+		if (left == old) {
+			left = nw;
+			flag = true;
+		}	
+		if (right == old) {
+			right = nw;
+			flag = true;
+		}	
+		if (flag) {
+			nw.addUse(this);
+			//old.removeUse(this);		
+		}
+	}
+	
+	@Override
+	public IRSymbol getRes() {
+		return result;
+	}
+
+	@Override
+	public void removeAllUse() {
+		left.removeUse(this);
+		right.removeUse(this);
+	}
+
+	@Override
+	public void removeAllDef() {
+		// TODO Auto-generated method stub
+		
+	} 
 }

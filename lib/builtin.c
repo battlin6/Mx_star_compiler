@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+char* __malloc(int n) {
+	return (char*) malloc(n);
+}
+
 void __print(char *str) {
 	printf("%s", str);
 }
@@ -19,7 +23,7 @@ void __printlnInt(int n) {
 }
 
 char* __getString() {
-	char* buffer = malloc(sizeof(char) * 256);
+	char* buffer = malloc(sizeof(char) * 512);
     scanf("%s", buffer);
     return buffer;
 } 
