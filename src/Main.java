@@ -27,7 +27,7 @@ public class Main {
 		//InputStream IS = new FileInputStream("test.txt");
 		CharStream AIS = CharStreams.fromStream(IS);
 
-		if(args[1].contains("semantic")) {
+		if(args[0].contains("semantic")) {
 
 			MxstarLexer lexer = new MxstarLexer(AIS);
 			lexer.removeErrorListeners();
