@@ -24,8 +24,8 @@ import Riscv.Operand.RegisterTable;
 public class Main {
 	public static void main(String[] args) throws IOException {
 		ErrorReminder errorReminder = new ErrorReminder();
-		//InputStream IS = System.in;
-		InputStream IS = new FileInputStream("test.txt");
+		InputStream IS = System.in;
+		//InputStream IS = new FileInputStream("test.txt");
 		CharStream AIS = CharStreams.fromStream(IS);
       	
 		MxstarLexer lexer = new MxstarLexer(AIS);
@@ -43,9 +43,9 @@ public class Main {
 
 		int count = errorReminder.count();
 		//System.out.println(count);
-		//if(args[0].equals("semantic")) {
+		if(args[0].equals("semantic")) {
 			//System.exit(0);
-		//}
+		}
 		
 		//build IR
 		GlobalScope globalScope = checker.getGlobalScope();
