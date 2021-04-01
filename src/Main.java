@@ -27,24 +27,6 @@ public class Main {
 		//InputStream IS = new FileInputStream("test.txt");
 		CharStream AIS = CharStreams.fromStream(IS);
 
-		if(args[0].contains("semantic")) {
-
-			MxstarLexer lexer = new MxstarLexer(AIS);
-			lexer.removeErrorListeners();
-			lexer.addErrorListener(new MxstarErrorListener(errorReminder));
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			MxstarParser parser = new MxstarParser(tokens);
-			parser.removeErrorListeners();
-			parser.addErrorListener(new MxstarErrorListener(errorReminder));
-
-			ASTBuilder ast = new ASTBuilder(errorReminder);
-			ProgramNode root = (ProgramNode) ast.visit(parser.program());
-			SemanticChecker checker = new SemanticChecker(errorReminder);
-			checker.visit(root);
-
-			int count = errorReminder.count();
-
-		} else {
 
 			MxstarLexer lexer = new MxstarLexer(AIS);
 			lexer.removeErrorListeners();
@@ -79,5 +61,4 @@ public class Main {
 			RvPrinter output = new RvPrinter("output.s", true);
 			output.visit(rvModule);
 		}
-	}
 }
