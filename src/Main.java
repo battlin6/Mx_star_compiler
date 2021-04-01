@@ -43,9 +43,9 @@ public class Main {
 
 		int count = errorReminder.count();
 		//System.out.println(count);
-		if(args[0].equals("semantic")) {
-			System.exit(0);
-		}
+		//if(args[0].equals("semantic")) {
+			//System.exit(0);
+		//}
 		
 		//build IR
 		GlobalScope globalScope = checker.getGlobalScope();
