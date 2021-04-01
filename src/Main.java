@@ -44,7 +44,7 @@ public class Main {
 		int count = errorReminder.count();
 		//System.out.println(count);
 		if(args[0].equals("semantic")) {
-			//System.exit(0);
+			System.exit(count);
 		}
 		
 		//build IR
