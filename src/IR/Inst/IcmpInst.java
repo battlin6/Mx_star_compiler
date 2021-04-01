@@ -1,6 +1,9 @@
 package IR.Inst;
 
+import java.util.ArrayList;
+
 import IR.IRVisitor;
+import IR.Symbol.IRRegister;
 import IR.Symbol.IRSymbol;
 
 public class IcmpInst extends IRInst {
@@ -24,17 +27,16 @@ public class IcmpInst extends IRInst {
         }
     }
 
-	private IcmpOpType op;
-	private IRSymbol result, left, right;
+	public IcmpOpType op;
+	private IRSymbol left, right;
+	private IRRegister result;
 	
-	public IcmpInst(IcmpOpType op, IRSymbol result, IRSymbol left, IRSymbol right) {
+	public IcmpInst(IcmpOpType op, IRRegister result, IRSymbol left, IRSymbol right) {
 		super();
 		this.op = op;
 		this.result = result;
 		this.left = left;
 		this.right = right;
-		left.addUse(this);
-		right.addUse(this);
 	}
 	
 	@Override
@@ -64,7 +66,7 @@ public class IcmpInst extends IRInst {
 		}
 	}
 	
-	public IRSymbol getRes() {
+	public IRRegister getRes() {
 		return result;
 	}
 
@@ -78,5 +80,34 @@ public class IcmpInst extends IRInst {
 	public void removeAllDef() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void InitDefUse() {
+		left.addUse(this);
+		right.addUse(this);
+		result.addDef(this);
+	}
+	
+	public IcmpOpType getOp() {
+		return op;
+	}
+	
+	public IRSymbol getLeft() {
+		return left;
+	}
+	
+	public IRSymbol getRight() {
+		return right;
+	}
+	
+	@Override
+	public ArrayList<IRRegister> getUsedRegister() {
+		ArrayList<IRRegister> res = new ArrayList<IRRegister>();
+		if (left instanceof IRRegister) 
+			res.add((IRRegister) left);
+		if (right instanceof IRRegister)
+			res.add((IRRegister) right);
+		return res;
 	}
 }

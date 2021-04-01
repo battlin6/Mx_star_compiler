@@ -1,6 +1,9 @@
 package IR.Inst;
 
+import java.util.ArrayList;
+
 import IR.IRVisitor;
+import IR.Symbol.IRRegister;
 import IR.Symbol.IRSymbol;
 
 public class BinOpInst extends IRInst {
@@ -24,19 +27,18 @@ public class BinOpInst extends IRInst {
         }
     }
 	
-	private BinOpType op;
-	private IRSymbol result, left, right;
+	public BinOpType op;
+	private IRRegister result;
+	private IRSymbol left, right;
 	
-	public BinOpInst(BinOpType op, IRSymbol result, IRSymbol left, IRSymbol right) {
+	public BinOpInst(BinOpType op, IRRegister result, IRSymbol left, IRSymbol right) {
 		super();
 		this.op = op;
 		this.result = result;
 		this.left = left;
 		this.right = right;
-		left.addUse(this);
-		right.addUse(this);
 	}
-	
+
 	@Override
 	public String toString() {
 		return result.toString() + " = " + 
@@ -64,12 +66,11 @@ public class BinOpInst extends IRInst {
 		}	
 		if (flag) {
 			nw.addUse(this);
-			//old.removeUse(this);		
 		}
 	}
 	
 	@Override
-	public IRSymbol getRes() {
+	public IRRegister getRes() {
 		return result;
 	}
 
@@ -83,5 +84,34 @@ public class BinOpInst extends IRInst {
 	public void removeAllDef() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void InitDefUse() {
+		left.addUse(this);
+		right.addUse(this);
+		result.addDef(this);
 	} 
+	
+	public BinOpType getOp() {
+		return op;
+	}
+	
+	public IRSymbol getLeft() {
+		return left;
+	}
+	
+	public IRSymbol getRight() {
+		return right;
+	}
+
+	@Override
+	public ArrayList<IRRegister> getUsedRegister() {
+		ArrayList<IRRegister> res = new ArrayList<IRRegister>();
+		if (left instanceof IRRegister) 
+			res.add((IRRegister) left);
+		if (right instanceof IRRegister)
+			res.add((IRRegister) right);
+		return res;
+	}
 }

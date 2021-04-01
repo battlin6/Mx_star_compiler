@@ -15,9 +15,9 @@ public class IRPrinter implements IRVisitor {
 	private PrintWriter printer;
 	private String tab = new String("    ");
 	
-	public IRPrinter() throws FileNotFoundException {
+	public IRPrinter(String path) throws FileNotFoundException {
 		//printer = new PrintWriter(System.out);
-		printer = new PrintWriter(new FileOutputStream("test.ll"));
+		printer = new PrintWriter(new FileOutputStream(path));
 	}
 	
 	@Override
@@ -168,72 +168,92 @@ public class IRPrinter implements IRVisitor {
 	}
 
 	@Override
-	public void visit(IRType node) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void visit(IRIntType node) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void visit(IRInt1Type node) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void visit(IRInt8Type node) {
-		// TODO Auto-generated method stub	
-	}
-
-	@Override
-	public void visit(IRInt32Type node) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void visit(IRVoidType node) {
-		// TODO Auto-generated method stub	
-	}
-
-	@Override
-	public void visit(IRPtrType node) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void visit(IRArrayType node) {
-		// TODO Auto-generated method stub
+	public void visit(MoveInst node) {
+		printer.println(tab + node.toString());
 	}
 
 	@Override
 	public void visit(IRSymbol node) {
 		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void visit(IRRegister node) {
 		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void visit(IRConstInt node) {
 		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void visit(IRConstBool node) {
 		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void visit(IRConstString node) {
 		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void visit(IRNull node) {
 		// TODO Auto-generated method stub
+		
 	}
+
+	@Override
+	public void visit(IRType node) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(IRIntType node) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(IRInt1Type node) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(IRInt8Type node) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(IRInt32Type node) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(IRVoidType node) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(IRPtrType node) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(IRArrayType node) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

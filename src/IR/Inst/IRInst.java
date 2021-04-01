@@ -1,8 +1,12 @@
 package IR.Inst;
 
+import java.util.ArrayList;
+
 import IR.IRBasicBlock;
 import IR.IRVisitor;
+import IR.Symbol.IRRegister;
 import IR.Symbol.IRSymbol;
+import Riscv.Inst.RvInst;
 
 abstract public class IRInst {
 	
@@ -12,6 +16,8 @@ abstract public class IRInst {
 	public IRInst() {
 		prev = next = null;
 		currentBlock = null;
+		rvInst = null;
+		ignored = false;
 	}
 	
 	@Override
@@ -43,11 +49,12 @@ abstract public class IRInst {
 		return currentBlock;
 	}
 	
-	public void removeIfself() {
+	public void removeItself() {
 		removeAllUse();
 		removeAllDef();
 		if (prev != null) prev.setNext(next);
 		else {
+			//System.err.println("current " + currentBlock);
 			currentBlock.setHead(next);
 		}
 		if (next != null) next.setPrev(prev);
@@ -56,11 +63,35 @@ abstract public class IRInst {
 		}
 	} 
 	
+	abstract public void InitDefUse();
+	
 	abstract public void replaceUse(IRSymbol old, IRSymbol nw);
 	
 	abstract public void removeAllUse();
 	
 	abstract public void removeAllDef();
 	
-	abstract public IRSymbol getRes();
+	abstract public IRRegister getRes();
+	
+	abstract public ArrayList<IRRegister> getUsedRegister();
+
+	//for instruction selection
+	protected RvInst rvInst;
+	protected boolean ignored;
+	
+	public void setIgnored() {
+		ignored = true;
+	}
+	
+	public boolean isIgnored() {
+		return ignored;
+	}
+	
+	public void setRvInst(RvInst rvInst) {
+		this.rvInst = rvInst;
+	}
+	
+	public RvInst getRvInst() {
+		return rvInst;
+	}
 }

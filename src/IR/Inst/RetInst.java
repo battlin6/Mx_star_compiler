@@ -1,6 +1,9 @@
 package IR.Inst;
 
+import java.util.ArrayList;
+
 import IR.IRVisitor;
+import IR.Symbol.IRRegister;
 import IR.Symbol.IRSymbol;
 
 public class RetInst extends IRInst {
@@ -14,7 +17,6 @@ public class RetInst extends IRInst {
 	public RetInst(IRSymbol value) {
 		super();
 		this.value = value;
-		value.addUse(this);
 	}
 	
 	@Override
@@ -42,9 +44,13 @@ public class RetInst extends IRInst {
 	}
 
 	@Override
-	public IRSymbol getRes() {
+	public IRRegister getRes() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public IRSymbol getValue() {
+		return value;
 	}
 
 	@Override
@@ -57,4 +63,18 @@ public class RetInst extends IRInst {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void InitDefUse() {
+		if (value != null) value.addUse(this);
+	}
+
+	@Override
+	public ArrayList<IRRegister> getUsedRegister() {
+		ArrayList<IRRegister> res = new ArrayList<IRRegister>();
+		if (value != null && (value instanceof IRRegister))
+			res.add((IRRegister) value);
+		return res;
+	}
+	
 }

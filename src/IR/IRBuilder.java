@@ -161,6 +161,7 @@ public class IRBuilder implements ASTVisitor {
 					varSymbol.setIRType(type);
 					module.addGlobalVariable(globalVariable);
 					ExprNode init = var.getInitValue();
+					//System.err.println(init);
 					if (init != null) {
 						init.accept(this);
 						IRSymbol initRes = init.getResult();
@@ -173,8 +174,17 @@ public class IRBuilder implements ASTVisitor {
 							}
 						}
 						else {
-							globalVariable.setInit(new IRNull());
-							currentBlock.addInst(new StoreInst(initRes, globalVariable));
+							//System.err.println(currentBlock.getTail());
+							IRInst tail = currentBlock.getTail();
+							if (tail instanceof GetElementPtrInst && tail.getRes().getName().indexOf("__stringLiteral") != -1) {
+								globalVariable.setInit(((GetElementPtrInst) tail).getPtr());
+								tail.setIgnored();
+							}
+							else 
+								globalVariable.setInit(new IRNull());
+							IRInst inst = new StoreInst(initRes, globalVariable);
+							inst.setIgnored();
+							currentBlock.addInst(inst);		
 						}	
 					}
 					else {
@@ -190,6 +200,7 @@ public class IRBuilder implements ASTVisitor {
 		if(!(currentBlock.getTail() instanceof BrInst))
 			currentBlock.addInst(new BrInst(currentBlock, returnBlock));
 		currentFunction.addBasicBlock(returnBlock);
+		currentFunction.setExitBlock(returnBlock);
 		currentBlock = returnBlock;
 		currentBlock.addInst(new RetInst());
 		
@@ -234,6 +245,7 @@ public class IRBuilder implements ASTVisitor {
 			currentFunction.addBasicBlock(entranceBlock);
 			currentBlock = entranceBlock;
 			if (node.getIdentifier().equals("main")) {
+				module.setMain(function);
 				currentBlock.addInst(new CallInst(module.getFunct("__init__"), new ArrayList<IRSymbol>()));
 			}
 			//parameters
@@ -285,6 +297,7 @@ public class IRBuilder implements ASTVisitor {
 				currentBlock.addInst(new BrInst(currentBlock, returnBlock));
 			}
 			currentFunction.addBasicBlock(returnBlock);
+			currentFunction.setExitBlock(returnBlock);
 			currentBlock = returnBlock;
 			if (returnType instanceof IRVoidType) {
 				currentBlock.addInst(new RetInst());
@@ -366,6 +379,7 @@ public class IRBuilder implements ASTVisitor {
 				currentBlock.addInst(new BrInst(currentBlock, returnBlock)); 
 			}
 			currentFunction.addBasicBlock(returnBlock);
+			currentFunction.setExitBlock(returnBlock);
 			currentBlock = returnBlock;
 			if (returnType instanceof IRVoidType) {
 				currentBlock.addInst(new RetInst());
@@ -575,16 +589,6 @@ public class IRBuilder implements ASTVisitor {
 		if (op == Operator.logicalAND) {
 			left.accept(this);
 			IRSymbol leftRes = left.getResult();
-			if (leftRes instanceof IRConstBool) {
-				if (!((IRConstBool) leftRes).getValue()) {
-					node.setResult(leftRes);
-				}
-				else {
-					right.accept(this);
-					node.setResult(right.getResult());
-				}
-				return;
-			}
 			IRBasicBlock logicalAnd = new IRBasicBlock("logicalAnd");
 			currentFunction.addBasicBlock(logicalAnd);
 			IRBasicBlock afterLogicalAnd = new IRBasicBlock("afterLogicalAnd");
@@ -612,16 +616,6 @@ public class IRBuilder implements ASTVisitor {
 		else if (op == Operator.logicalOR) {
 			left.accept(this);
 			IRSymbol leftRes = left.getResult();
-			if (leftRes instanceof IRConstBool) {
-				if (((IRConstBool) leftRes).getValue()) {
-					node.setResult(leftRes);
-				}
-				else {
-					right.accept(this);
-					node.setResult(right.getResult());
-				}
-				return;
-			}
 			IRBasicBlock logicalOr = new IRBasicBlock("logicalOr");
 			currentFunction.addBasicBlock(logicalOr);
 			IRBasicBlock afterLogicalOr = new IRBasicBlock("afterLogicalOr");
@@ -729,15 +723,10 @@ public class IRBuilder implements ASTVisitor {
 				Type leftType = node.getLeft().getType();
 				Type rightType = node.getRight().getType();
 				if (leftType instanceof IntType && rightType instanceof IntType) {
-					if (leftRes instanceof IRConstInt && rightRes instanceof IRConstInt) {
-						node.setResult(new IRConstBool(((IRConstInt) leftRes).getValue() == ((IRConstInt) rightRes).getValue()));
-					}
-					else {
-						IRRegister res = new IRRegister(new IRInt1Type(), "eq");
-						currentFunction.addRegister(res);
-						currentBlock.addInst(new IcmpInst(IcmpOpType.eq, res, leftRes, rightRes));
-						node.setResult(res);		
-					}
+					IRRegister res = new IRRegister(new IRInt1Type(), "eq");
+					currentFunction.addRegister(res);
+					currentBlock.addInst(new IcmpInst(IcmpOpType.eq, res, leftRes, rightRes));
+					node.setResult(res);		
 				}
 				else if ((leftType instanceof BoolType && rightType instanceof BoolType) ||    
 				     (leftType instanceof ClassSymbol && rightType instanceof NullType)  ||    
@@ -768,15 +757,10 @@ public class IRBuilder implements ASTVisitor {
 				Type leftType = node.getLeft().getType();
 				Type rightType = node.getRight().getType();
 				if (leftType instanceof IntType && rightType instanceof IntType) {
-					if (leftRes instanceof IRConstInt && rightRes instanceof IRConstInt) {
-						node.setResult(new IRConstBool(((IRConstInt) leftRes).getValue() != ((IRConstInt) rightRes).getValue()));
-					}
-					else {
-						IRRegister res = new IRRegister(new IRInt1Type(), "ne");
-						currentFunction.addRegister(res);
-						currentBlock.addInst(new IcmpInst(IcmpOpType.ne, res, leftRes, rightRes));
-						node.setResult(res);		
-					}
+					IRRegister res = new IRRegister(new IRInt1Type(), "ne");
+					currentFunction.addRegister(res);
+					currentBlock.addInst(new IcmpInst(IcmpOpType.ne, res, leftRes, rightRes));
+					node.setResult(res);		
 				}
 				else if ((leftType instanceof BoolType && rightType instanceof BoolType) ||    
 				     (leftType instanceof ClassSymbol && rightType instanceof NullType)  ||    
@@ -806,15 +790,10 @@ public class IRBuilder implements ASTVisitor {
 			else if (op == Operator.LESS) {
 				Type leftType = node.getLeft().getType();
 				if (leftType instanceof IntType) {
-					if (leftRes instanceof IRConstInt && rightRes instanceof IRConstInt) {
-						node.setResult(new IRConstBool(((IRConstInt) leftRes).getValue() < ((IRConstInt) rightRes).getValue()));
-					}
-					else {
-						IRRegister res = new IRRegister(new IRInt1Type(), "slt");
-						currentFunction.addRegister(res);
-						currentBlock.addInst(new IcmpInst(IcmpOpType.slt, res, leftRes, rightRes));
-						node.setResult(res);		
-					}	
+					IRRegister res = new IRRegister(new IRInt1Type(), "slt");
+					currentFunction.addRegister(res);
+					currentBlock.addInst(new IcmpInst(IcmpOpType.slt, res, leftRes, rightRes));
+					node.setResult(res);		
 				}
 				else if (leftType instanceof StringType) {
 					IRRegister res = new IRRegister(new IRInt1Type(), "slt");
@@ -830,15 +809,10 @@ public class IRBuilder implements ASTVisitor {
 			else if (op == Operator.lessEQU) {
 				Type leftType = node.getLeft().getType();
 				if (leftType instanceof IntType) {
-					if (leftRes instanceof IRConstInt && rightRes instanceof IRConstInt) {
-						node.setResult(new IRConstBool(((IRConstInt) leftRes).getValue() <= ((IRConstInt) rightRes).getValue()));
-					}
-					else {
-						IRRegister res = new IRRegister(new IRInt1Type(), "sle");
-						currentFunction.addRegister(res);
-						currentBlock.addInst(new IcmpInst(IcmpOpType.sle, res, leftRes, rightRes));
-						node.setResult(res);	
-					}
+					IRRegister res = new IRRegister(new IRInt1Type(), "sle");
+					currentFunction.addRegister(res);
+					currentBlock.addInst(new IcmpInst(IcmpOpType.sle, res, leftRes, rightRes));
+					node.setResult(res);	
 				}
 				else if (leftType instanceof StringType) {
 					IRRegister res = new IRRegister(new IRInt1Type(), "sle");
@@ -854,15 +828,10 @@ public class IRBuilder implements ASTVisitor {
 			else if (op == Operator.GREATER) {
 				Type leftType = node.getLeft().getType();
 				if (leftType instanceof IntType) {
-					if (leftRes instanceof IRConstInt && rightRes instanceof IRConstInt) {
-						node.setResult(new IRConstBool(((IRConstInt) leftRes).getValue() > ((IRConstInt) rightRes).getValue()));
-					}
-					else {
-						IRRegister res = new IRRegister(new IRInt1Type(), "sgt");
-						currentFunction.addRegister(res);
-						currentBlock.addInst(new IcmpInst(IcmpOpType.sgt, res, leftRes, rightRes));
-						node.setResult(res);		
-					}
+					IRRegister res = new IRRegister(new IRInt1Type(), "sgt");
+					currentFunction.addRegister(res);
+					currentBlock.addInst(new IcmpInst(IcmpOpType.sgt, res, leftRes, rightRes));
+					node.setResult(res);		
 				}
 				else if (leftType instanceof StringType) {
 					IRRegister res = new IRRegister(new IRInt1Type(), "sgt");
@@ -878,15 +847,10 @@ public class IRBuilder implements ASTVisitor {
 			else if (op == Operator.greaterEQU) {
 				Type leftType = node.getLeft().getType();
 				if (leftType instanceof IntType) {
-					if (leftRes instanceof IRConstInt && rightRes instanceof IRConstInt) {
-						node.setResult(new IRConstBool(((IRConstInt) leftRes).getValue() >= ((IRConstInt) rightRes).getValue()));
-					}
-					else {
-						IRRegister res = new IRRegister(new IRInt1Type(), "sge");
-						currentFunction.addRegister(res);
-						currentBlock.addInst(new IcmpInst(IcmpOpType.sge, res, leftRes, rightRes));
-						node.setResult(res);
-					}
+					IRRegister res = new IRRegister(new IRInt1Type(), "sge");
+					currentFunction.addRegister(res);
+					currentBlock.addInst(new IcmpInst(IcmpOpType.sge, res, leftRes, rightRes));
+					node.setResult(res);
 				}
 				else if (leftType instanceof StringType) {
 					IRRegister res = new IRRegister(new IRInt1Type(), "sge");
@@ -916,65 +880,38 @@ public class IRBuilder implements ASTVisitor {
 			node.setResult(exprRes);
 		}
 		else if (op == Operator.NEG) {
-			if (exprRes instanceof IRConstInt) {
-				node.setResult(new IRConstInt(-((IRConstInt) exprRes).getValue()));
-			}
-			else {
-				IRRegister res = new IRRegister(new IRInt32Type(), "neg");
-				currentFunction.addRegister(res);
-				currentBlock.addInst(new BinOpInst(BinOpType.sub, res, new IRConstInt(0), exprRes));
-				node.setResult(res);
-			}
+			IRRegister res = new IRRegister(new IRInt32Type(), "neg");
+			currentFunction.addRegister(res);
+			currentBlock.addInst(new BinOpInst(BinOpType.sub, res, new IRConstInt(0), exprRes));
+			node.setResult(res);
 		}
 		else if (op == Operator.prefixINCR) {
-			IRSymbol res;
-			if (exprRes instanceof IRConstInt) {
-				res = new IRConstInt(((IRConstInt) exprRes).getValue() + 1);
-			}
-			else {
-				res = new IRRegister(new IRInt32Type(), "prefixIncr");
-				currentFunction.addRegister((IRRegister) res);
-				currentBlock.addInst(new BinOpInst(BinOpType.add, res, exprRes, new IRConstInt(1)));
-			}
+			IRRegister res = new IRRegister(new IRInt32Type(), "prefixIncr");
+			currentFunction.addRegister(res);
+			currentBlock.addInst(new BinOpInst(BinOpType.add, res, exprRes, new IRConstInt(1)));
 			currentBlock.addInst(new StoreInst(res, expr.getAddress()));
 			node.setResult(res);
 			node.setAddress(expr.getAddress());
 		}
 		else if (op == Operator.prefixDECR) {
-			IRSymbol res;
-			if (exprRes instanceof IRConstInt) {
-				res = new IRConstInt(((IRConstInt) exprRes).getValue() - 1);
-			}
-			else {
-				res = new IRRegister(new IRInt32Type(), "prefixDecr");
-				currentFunction.addRegister((IRRegister) res);
-				currentBlock.addInst(new BinOpInst(BinOpType.sub, res, exprRes, new IRConstInt(1)));
-			}
+			IRRegister res = new IRRegister(new IRInt32Type(), "prefixDecr");
+			currentFunction.addRegister(res);
+			currentBlock.addInst(new BinOpInst(BinOpType.sub, res, exprRes, new IRConstInt(1)));
 			currentBlock.addInst(new StoreInst(res, expr.getAddress()));
 			node.setResult(res);
 			node.setAddress(expr.getAddress());
 		}
 		else if (op == Operator.logicalNOT) {
-			if (exprRes instanceof IRConstBool) {
-				node.setResult(new IRConstBool(!((IRConstBool) exprRes).getValue()));
-			}
-			else {
-				IRRegister res = new IRRegister(new IRInt1Type(), "logicalNot");
-				currentFunction.addRegister(res);
-				currentBlock.addInst(new BitwiseBinOpInst(BitwiseBinOpType.xor, res, exprRes, new IRConstBool(true)));
-				node.setResult(res);
-			}
-		}	
+			IRRegister res = new IRRegister(new IRInt1Type(), "logicalNot");
+			currentFunction.addRegister(res);
+			currentBlock.addInst(new BitwiseBinOpInst(BitwiseBinOpType.xor, res, exprRes, new IRConstBool(true)));
+			node.setResult(res);
+		}
 		else if (op == Operator.bitwiseNOT) {
-			if (exprRes instanceof IRConstInt) {
-				node.setResult(new IRConstInt(~((IRConstInt) exprRes).getValue()));
-			}
-			else {
-				IRRegister res = new IRRegister(new IRInt32Type(), "bitwiseNot");
-				currentFunction.addRegister(res);
-				currentBlock.addInst(new BitwiseBinOpInst(BitwiseBinOpType.xor, res, exprRes, new IRConstInt(-1)));
-				node.setResult(res);
-			}
+			IRRegister res = new IRRegister(new IRInt32Type(), "bitwiseNot");
+			currentFunction.addRegister(res);
+			currentBlock.addInst(new BitwiseBinOpInst(BitwiseBinOpType.xor, res, exprRes, new IRConstInt(-1)));
+			node.setResult(res);
 		}
 	}
 
@@ -985,29 +922,17 @@ public class IRBuilder implements ASTVisitor {
 		expr.accept(this);
 		IRSymbol exprRes = expr.getResult();
 		if (op == Operator.suffixINCR) {
-			IRSymbol res;
-			if (exprRes instanceof IRConstInt) {
-				res = new IRConstInt(((IRConstInt) exprRes).getValue() + 1);
-			}
-			else {
-				res = new IRRegister(new IRInt32Type(), "suffixIncr");
-				currentFunction.addRegister((IRRegister) res);
-				currentBlock.addInst(new BinOpInst(BinOpType.add, res, exprRes, new IRConstInt(1)));
-			}
+			IRRegister res = new IRRegister(new IRInt32Type(), "suffixIncr");
+			currentFunction.addRegister(res);
+			currentBlock.addInst(new BinOpInst(BinOpType.add, res, exprRes, new IRConstInt(1)));
 			currentBlock.addInst(new StoreInst(res, expr.getAddress()));
 			node.setResult(exprRes);
 			node.setAddress(expr.getAddress());
 		}
 		else if (op == Operator.suffixDECR) {
-			IRSymbol res;
-			if (exprRes instanceof IRConstInt) {
-				res = new IRConstInt(((IRConstInt) exprRes).getValue() - 1);
-			}
-			else {
-				res = new IRRegister(new IRInt32Type(), "suffixDecr");
-				currentFunction.addRegister((IRRegister) res);
-				currentBlock.addInst(new BinOpInst(BinOpType.sub, res, exprRes, new IRConstInt(1)));	
-			}
+			IRRegister res = new IRRegister(new IRInt32Type(), "suffixDecr");
+			currentFunction.addRegister(res);
+			currentBlock.addInst(new BinOpInst(BinOpType.sub, res, exprRes, new IRConstInt(1)));
 			currentBlock.addInst(new StoreInst(res, expr.getAddress()));
 			node.setResult(exprRes);
 			node.setAddress(expr.getAddress());
@@ -1028,7 +953,7 @@ public class IRBuilder implements ASTVisitor {
 			type = new IRPtrType(type);
 		ExprNode index = indexes.get(0);
 		
-		IRSymbol mul = new IRRegister(new IRInt32Type(), "mul");
+		IRRegister mul = new IRRegister(new IRInt32Type(), "mul");
 		currentFunction.addRegister((IRRegister)mul);
 		currentBlock.addInst(new BinOpInst(BinOpInst.BinOpType.mul, mul, new IRConstInt(((IRPtrType) type).getType().bytes()), index.getResult()));
 		
@@ -1141,7 +1066,7 @@ public class IRBuilder implements ASTVisitor {
 		}
 		ExprNode index = indexes.get(0);
 		
-		IRSymbol mul = new IRRegister(new IRInt32Type(), "mul");
+		IRRegister mul = new IRRegister(new IRInt32Type(), "mul");
 		currentFunction.addRegister((IRRegister)mul);
 		currentBlock.addInst(new BinOpInst(BinOpInst.BinOpType.mul, mul, new IRConstInt(8), index.getResult()));
 		
@@ -1361,6 +1286,7 @@ public class IRBuilder implements ASTVisitor {
 		
 	}
 	
+	
 	@Override
 	public void visit(MemberExprNode node) {
 		ExprNode nameExpr = node.getNameExpr();
@@ -1523,7 +1449,7 @@ public class IRBuilder implements ASTVisitor {
 	public void visit(StringLiteralNode node) {
 	    IRGlobalString globalString = module.addGlobalString(node.getString());
 	    globalString.getType();
-	    IRRegister res = new IRRegister(new IRPtrType(new IRInt8Type()), "stringLiteral");
+	    IRRegister res = new IRRegister(new IRPtrType(new IRInt8Type()), "__stringLiteral");
 	    currentFunction.addRegister(res);
 	    currentBlock.addInst(new GetElementPtrInst(res, globalString, new IRConstInt(0), new IRConstInt(0)));
 	    

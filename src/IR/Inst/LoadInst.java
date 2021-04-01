@@ -1,16 +1,19 @@
 package IR.Inst;
 
+import java.util.ArrayList;
+
 import IR.IRVisitor;
+import IR.Symbol.IRRegister;
 import IR.Symbol.IRSymbol;
 
 public class LoadInst extends IRInst {
-	private IRSymbol res, ptr;
+	private IRSymbol ptr;
+	private IRRegister res;
 	
-	public LoadInst(IRSymbol res, IRSymbol ptr) {
+	public LoadInst(IRRegister res, IRSymbol ptr) {
 		super();
 		this.res = res;
 		this.ptr = ptr;
-		ptr.addUse(this);
 	}
 
 	@Override
@@ -32,7 +35,7 @@ public class LoadInst extends IRInst {
 		}
 	}
 	
-	public IRSymbol getRes() {
+	public IRRegister getRes() {
 		return res;
 	}
 	
@@ -49,6 +52,20 @@ public class LoadInst extends IRInst {
 	public void removeAllDef() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void InitDefUse() {
+		res.addDef(this);
+		ptr.addUse(this);
+	}
+
+	@Override
+	public ArrayList<IRRegister> getUsedRegister() {
+		ArrayList<IRRegister> res = new ArrayList<IRRegister>();
+		if (ptr instanceof IRRegister)
+			res.add((IRRegister) ptr);
+		return res;
 	}
 	
 }

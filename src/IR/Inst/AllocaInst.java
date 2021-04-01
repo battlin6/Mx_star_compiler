@@ -1,5 +1,7 @@
 package IR.Inst;
 
+import java.util.ArrayList;
+
 import IR.IRVisitor;
 import IR.Symbol.IRRegister;
 import IR.Symbol.IRSymbol;
@@ -45,5 +47,19 @@ public class AllocaInst extends IRInst {
 	public void removeAllDef() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void InitDefUse() {
+		//res.addDef(this);
+	}
+
+	@Override
+	public ArrayList<IRRegister> getUsedRegister() {
+		return new ArrayList<IRRegister>();
+	}
+	
+	public IRType getType() {
+		return type;
 	}
 }

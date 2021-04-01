@@ -7,6 +7,7 @@ import java.util.HashSet;
 
 import IR.Symbol.IRRegister;
 import IR.Type.IRType;
+import Riscv.RvFunction;
 
 public class IRFunction {
 	private IRType type;
@@ -14,17 +15,19 @@ public class IRFunction {
 	private ArrayList<IRRegister> parameters;
 	private HashMap<String, ArrayList<IRRegister>> registerHash;
 	private HashMap<String, ArrayList<IRBasicBlock>> blockHash;
-	private IRBasicBlock entranceBlock, lastBlock;
+	private IRBasicBlock entranceBlock, lastBlock, exitBlock;
 	
 	//for Constructing SSA
 	private ArrayList<IRBasicBlock> dfsSeq;
 	private HashSet<IRBasicBlock> visited;
+	private ArrayList<IRBasicBlock> RdfsSeq;
+	private HashSet<IRBasicBlock> Rvisited;
 	
 	public IRFunction(IRType type, String name) {
 		this.type = type;
 		this.name = name;
 		this.parameters = new ArrayList<IRRegister>();
-		this.entranceBlock = this.lastBlock = null;
+		this.entranceBlock = this.lastBlock = this.exitBlock = null;
 		this.registerHash = new HashMap<String, ArrayList<IRRegister>>();
 		this.blockHash = new HashMap<String, ArrayList<IRBasicBlock>>();
 	}
@@ -33,11 +36,11 @@ public class IRFunction {
 		this.type = type;
 		this.name = name;
 		this.parameters = parameters;
-		this.entranceBlock = this.lastBlock = null;
+		this.entranceBlock = this.lastBlock = this.exitBlock = null;
 		this.registerHash = new HashMap<String, ArrayList<IRRegister>>();
 		this.blockHash = new HashMap<String, ArrayList<IRBasicBlock>>();
 	}
-	
+
 	public String declarationString () {
 		StringBuilder builder = new StringBuilder("declare " + type.toString() + " @" + name + "(");
 		for(int i = 0; i < parameters.size(); ++i) {
@@ -60,6 +63,10 @@ public class IRFunction {
 		}
 		builder.append(")");
 		return builder.toString();
+	}
+	
+	public ArrayList<IRRegister> getParameters() {
+		return parameters;
 	}
 	
 	public void addParameter(IRRegister reg) {
@@ -126,6 +133,14 @@ public class IRFunction {
 		lastBlock = block;
 	}
 	
+	public IRBasicBlock getExitBlock() {
+		return exitBlock;
+	}
+	
+	public void setExitBlock(IRBasicBlock block) {
+		exitBlock = block;
+	}
+	
 	public void accept(IRVisitor visitor) {
 		visitor.visit(this);
 	}
@@ -134,11 +149,33 @@ public class IRFunction {
 		return dfsSeq;
 	}
 	
+	public ArrayList<IRBasicBlock> getRDfsSeq() {
+		return RdfsSeq;
+	}
+	
 	public ArrayList<IRBasicBlock> dfsBasicBlock() {
 		dfsSeq = new ArrayList<IRBasicBlock>();
 		visited = new HashSet<IRBasicBlock>();
 		entranceBlock.dfs(visited, dfsSeq);
 		return dfsSeq;
 	}
+
+	public ArrayList<IRBasicBlock> RdfsBasicBlock() {
+		RdfsSeq = new ArrayList<IRBasicBlock>();
+		Rvisited = new HashSet<IRBasicBlock>();
+	//	System.err.println("exit " + exitBlock);
+		exitBlock.Rdfs(Rvisited, RdfsSeq);
+		return RdfsSeq;
+	}
 	
+	//for instruction selection
+	private RvFunction function;
+	
+	public void setRvFunction(RvFunction function) {
+		this.function = function;
+	}
+	
+	public RvFunction toRvFunction() {
+		return function;
+	}
 }

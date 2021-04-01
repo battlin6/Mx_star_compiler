@@ -16,24 +16,13 @@ public class PhiInst extends IRInst {
 		this.res = res;
 		this.symbols = new ArrayList<IRSymbol>();
 		this.bbs = new ArrayList<IRBasicBlock>();
-		for (IRSymbol s : symbols) {
-			s.addUse(this);
-		}
-		for (IRBasicBlock block : bbs) {
-			block.addPhiUse(this);
-		}
+		
 	}
 
 	public PhiInst(IRRegister res, ArrayList<IRSymbol> symbols, ArrayList<IRBasicBlock> bbs) {
 		this.res = res;
 		this.symbols = symbols;
 		this.bbs = bbs;
-		for (IRSymbol s : symbols) {
-			s.addUse(this);
-		}
-		for (IRBasicBlock block : bbs) {
-			block.addPhiUse(this);
-		}
 	}
 	
 	public void addBranch(IRSymbol symbol, IRBasicBlock bb) {
@@ -45,6 +34,14 @@ public class PhiInst extends IRInst {
 	
 	public IRRegister getRes() {
 		return res;
+	}
+	
+	public ArrayList<IRSymbol> getSymbols() {
+		return symbols;
+	}
+	
+	public ArrayList<IRBasicBlock> getBBs() {
+		return bbs;
 	}
 	
 	@Override
@@ -73,7 +70,6 @@ public class PhiInst extends IRInst {
 			}
 		}
 		if (flag) {
-		//	old.removeUse(this);
 			nw.addUse(this);
 		}
 	}
@@ -91,7 +87,6 @@ public class PhiInst extends IRInst {
 	@Override
 	public void removeAllDef() {
 		// TODO Auto-generated method stub
-		
 	}
 	
 	public void replacePhiUse(IRBasicBlock old, IRBasicBlock nw) {
@@ -103,14 +98,49 @@ public class PhiInst extends IRInst {
 			}
 		}
 		if (flag) {
-		//	old.removePhiUse(this);
 			nw.addPhiUse(this);
 		}
 	}
 	
-	public void removeAllPhiUse() {
+	public void removePhiUse(IRBasicBlock bb) {
+		int index = bbs.indexOf(bb);
+		if (index != -1) {
+			bbs.remove(index);
+			symbols.remove(index);
+		}
+	}
+
+	@Override
+	public void InitDefUse() {
+		res.addDef(this);
+		//System.err.println("------------phi " + res);
+		for (IRSymbol s : symbols) {
+			s.addUse(this);
+		}
 		for (IRBasicBlock block : bbs) {
-			block.removePhiUse(this);
+			block.addPhiUse(this);
+		}
+	}
+
+	@Override
+	public ArrayList<IRRegister> getUsedRegister() {
+		ArrayList<IRRegister> res = new ArrayList<IRRegister>();
+		for (IRSymbol s : symbols) {
+			if (s instanceof IRRegister) {
+				res.add((IRRegister) s);
+			}
+		}
+		return res;
+	}
+	
+	public void simplify() {
+		if (bbs.size() == 1) {
+			assert symbols.size() == 1;
+			IRSymbol symbol = symbols.get(0);
+			res.replaceUse(symbol);
+			IRBasicBlock bb = bbs.get(0);
+			bb.removePhiUse(this);
+			removeItself();
 		}
 	}
 }
