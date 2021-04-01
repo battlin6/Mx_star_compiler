@@ -64,7 +64,7 @@ public class RvTypeI extends RvInst {
 	@Override
 	public String toString() {
 		if (op == Op.sltiu) 
-			return "\tsltiuu   " + rd + "," + rs + "," + imm;
+			return "\tsltiu   " + rd + "," + rs + "," + imm;
 		else 
 			return  "\t" + op + "    " + rd + "," + rs + "," + imm; 
 	}
