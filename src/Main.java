@@ -28,9 +28,7 @@ public class Main {
         ExceptionListener exceptionListener = new ExceptionListener();
 
         InputStream is = System.in;
-        /*for file*******************/
-        is = new FileInputStream("test/test.txt");
-        /*for file******************/
+        //is = new FileInputStream("test/test.txt");
         ANTLRInputStream input = new ANTLRInputStream(is);
 
         MXgrammarLexer lexer = new MXgrammarLexer(input);
