@@ -955,11 +955,11 @@ public class IRBuilder implements ASTVisitor {
 		
 		IRRegister mul = new IRRegister(new IRInt32Type(), "mul");
 		currentFunction.addRegister((IRRegister)mul);
-		currentBlock.addInst(new BinOpInst(BinOpInst.BinOpType.mul, mul, new IRConstInt(((IRPtrType) type).getType().bytes()), index.getResult()));
+		currentBlock.addInst(new BinOpInst(BinOpType.mul, mul, new IRConstInt(((IRPtrType) type).getType().bytes()), index.getResult()));
 		
 		IRRegister add = new IRRegister(new IRInt32Type(), "add");
 		currentFunction.addRegister(add);
-		currentBlock.addInst(new BinOpInst(BinOpInst.BinOpType.add, add, mul, new IRConstInt(4)));
+		currentBlock.addInst(new BinOpInst(BinOpType.add, add, mul, new IRConstInt(4)));
 		
 		IRRegister malloc8 = new IRRegister(new IRPtrType(new IRInt8Type()), "malloc8");
 		currentFunction.addRegister(malloc8);
@@ -1019,7 +1019,7 @@ public class IRBuilder implements ASTVisitor {
 			
 			IRRegister ne = new IRRegister(new IRInt1Type(), "ne");
 			currentFunction.addRegister(ne);
-			currentBlock.addInst(new IcmpInst(IcmpInst.IcmpOpType.ne, ne, arrayNow, arrayTail));
+			currentBlock.addInst(new IcmpInst(IcmpOpType.ne, ne, arrayNow, arrayTail));
 			
 			if(!(currentBlock.getTail() instanceof BrInst))
 				currentBlock.addInst(new BrInst(currentBlock, ne, creatorBodyBlock, afterCreatorBlock));
@@ -1068,11 +1068,11 @@ public class IRBuilder implements ASTVisitor {
 		
 		IRRegister mul = new IRRegister(new IRInt32Type(), "mul");
 		currentFunction.addRegister((IRRegister)mul);
-		currentBlock.addInst(new BinOpInst(BinOpInst.BinOpType.mul, mul, new IRConstInt(8), index.getResult()));
+		currentBlock.addInst(new BinOpInst(BinOpType.mul, mul, new IRConstInt(8), index.getResult()));
 		
 		IRRegister add = new IRRegister(new IRInt32Type(), "add");
 		currentFunction.addRegister(add);
-		currentBlock.addInst(new BinOpInst(BinOpInst.BinOpType.add, add, mul, new IRConstInt(4)));
+		currentBlock.addInst(new BinOpInst(BinOpType.add, add, mul, new IRConstInt(4)));
 		
 		IRRegister malloc8 = new IRRegister(new IRPtrType(new IRInt8Type()), "malloc8");
 		currentFunction.addRegister(malloc8);
@@ -1127,7 +1127,7 @@ public class IRBuilder implements ASTVisitor {
 			
 			IRRegister ne = new IRRegister(new IRInt1Type(), "ne");
 			currentFunction.addRegister(ne);
-			currentBlock.addInst(new IcmpInst(IcmpInst.IcmpOpType.ne, ne, arrayNow, arrayTail));
+			currentBlock.addInst(new IcmpInst(IcmpOpType.ne, ne, arrayNow, arrayTail));
 			
 			if(!(currentBlock.getTail() instanceof BrInst))
 				currentBlock.addInst(new BrInst(currentBlock, ne, creatorBodyBlock, afterCreatorBlock));
