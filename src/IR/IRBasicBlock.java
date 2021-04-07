@@ -1,15 +1,12 @@
 package IR;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import IR.Inst.BrInst;
-import IR.Inst.CallInst;
-import IR.Inst.IRInst;
-import IR.Inst.MoveInst;
-import IR.Inst.PhiInst;
+import IR.Inst.*;
 import IR.Symbol.IRRegister;
 import Riscv.RvBlock;
 import utility.Pair;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 public class IRBasicBlock {
 	private String name;

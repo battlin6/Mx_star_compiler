@@ -1858,7 +1858,7 @@ public class MxstarParser extends Parser {
 			setState(269);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,26,_ctx);
-			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
@@ -2336,7 +2336,7 @@ public class MxstarParser extends Parser {
 						setState(285); 
 						_errHandler.sync(this);
 						_alt = getInterpreter().adaptivePredict(_input,28,_ctx);
-					} while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER );
+					} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
 					}
 					break;
 				case 2:
@@ -2345,7 +2345,7 @@ public class MxstarParser extends Parser {
 					setState(295);
 					_errHandler.sync(this);
 					_alt = getInterpreter().adaptivePredict(_input,30,_ctx);
-					while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
+					while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 						if ( _alt==1 ) {
 							{
 							setState(293);
@@ -2393,7 +2393,7 @@ public class MxstarParser extends Parser {
 					setState(311);
 					_errHandler.sync(this);
 					_alt = getInterpreter().adaptivePredict(_input,32,_ctx);
-					while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
+					while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 						if ( _alt==1 ) {
 							{
 							setState(309);
@@ -2463,11 +2463,11 @@ public class MxstarParser extends Parser {
 					setState(323); 
 					_errHandler.sync(this);
 					_alt = getInterpreter().adaptivePredict(_input,34,_ctx);
-				} while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER );
+				} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
 				setState(329);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,35,_ctx);
-				while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
+				while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 					if ( _alt==1 ) {
 						{
 						{
