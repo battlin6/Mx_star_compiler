@@ -1,6 +1,7 @@
 package BackEnd.Construct.RegisterAllocate;
 
 import BackEnd.ASMBlock;
+import BackEnd.ASMFunction;
 import BackEnd.ASMModule;
 import BackEnd.Construct.ASMPass;
 import BackEnd.Construct.LivenessAnalysis;
@@ -10,7 +11,6 @@ import BackEnd.Operand.ASMRegister.PhysicalASMRegister;
 import BackEnd.Operand.ASMRegister.VirtualASMRegister;
 import BackEnd.Operand.Address.StackLocation;
 import BackEnd.Operand.Immediate.IntImmediate;
-import BackEnd.ASMFunction;
 import IR.Module;
 import Optimization.Loop.LoopAnalysis;
 

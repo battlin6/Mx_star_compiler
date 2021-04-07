@@ -1,7 +1,7 @@
 package Semantic.ASTtype;
 
-import Semantic.ExceptionHandle.CompileError;
 import Semantic.ASTtype.NonArray.NonArrayType;
+import Semantic.ExceptionHandle.CompileError;
 
 import java.util.HashMap;
 

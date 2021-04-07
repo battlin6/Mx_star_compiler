@@ -1,4 +1,4 @@
-package Utility;
+package utility;
 
 public class Pair<FirstType, SecondType> {
     private FirstType first;

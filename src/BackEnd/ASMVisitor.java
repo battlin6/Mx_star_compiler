@@ -1,10 +1,10 @@
 package BackEnd;
 
+import BackEnd.Instruction.*;
 import BackEnd.Instruction.BinaryInst.ITypeBinaryInst;
 import BackEnd.Instruction.BinaryInst.RTypeBinaryInst;
 import BackEnd.Instruction.Branch.BinaryBranchInst;
 import BackEnd.Instruction.Branch.UnaryBranchInst;
-import BackEnd.Instruction.*;
 import BackEnd.Operand.ASMGlobalVar;
 
 public interface ASMVisitor {
