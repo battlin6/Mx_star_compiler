@@ -1,46 +1,38 @@
 package AST;
 
-import utility.Location;
-import utility.Operator;
+import AST.Location.Location;
+import AST.NodeProperties.ExprNode;
+import AST.Visit.ASTVisitor;
+import Semantic.ExceptionHandle.CompileError;
 
 public class PrefixExprNode extends ExprNode {
-	private Operator op;
-	private ExprNode expr;
-	
-	public PrefixExprNode(Location loc, Operator op, ExprNode expr) {
-		super(loc);
-		this.op = op;
-		this.expr = expr;
-	}
-	
-	public ExprNode getExpr() {
-		return expr;
-	}
-	
-	public Operator getOp() {
-		return op;
-	}
-	
-	/*
-	public String opToString() {
-		if (op == Operator.POS)
-			return new String("+");
-		else if (op == Operator.NEG)
-			return new String("-");
-		else if (op == Operator.prefixINCR)
-			return new String("++");
-		else if (op == Operator.prefixDECR)
-			return new String("--");
-		else if (op == Operator.bitwiseNOT)
-			return new String("~");
-		else if (op == Operator.logicalNOT)
-			return new String("!");
-		else 
-			return new String("");
-	}
-	*/
-	
-	public void accept(ASTVisitor visitor) {
-		visitor.visit(this);
-	}
+    private ExprNode expr;
+    private String op;  //"++" "--" "+" "-" "!" "~"
+
+    public PrefixExprNode(String text, Location location, String op, ExprNode expr) {
+        super(text, location);
+        this.op = op;
+        this.expr = expr;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) throws CompileError {
+        visitor.visit(this);
+    }
+
+    public ExprNode getExpr() {
+        return expr;
+    }
+
+    public void setExpr(ExprNode expr) {
+        this.expr = expr;
+    }
+
+    public String getOp() {
+        return op;
+    }
+
+    public void setOp(String op) {
+        this.op = op;
+    }
 }

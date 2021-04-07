@@ -1,48 +1,38 @@
 package AST;
 
-import Scope.Symbol;
-import utility.Location;
+import AST.Location.Location;
+import AST.NodeProperties.ExprNode;
+import AST.Visit.ASTVisitor;
+import Semantic.ExceptionHandle.CompileError;
 
 public class MemberExprNode extends ExprNode {
-	private ExprNode nameExpr, memberExpr;
-	private String identifier;
-	
-	public MemberExprNode(Location loc, ExprNode nameExpr, String identifier, ExprNode memberExpr) {
-		super(loc);
-		this.nameExpr = nameExpr;
-		this.identifier = identifier;
-		this.memberExpr = memberExpr;
-		this.symbol = null;
-	}
-	
-	public ExprNode getNameExpr() {
-		return nameExpr;
-	}
-	
-	public String getIdentifier() {
-		return identifier;
-	}
-	
-	public ExprNode getMemberExpr() {
-		return memberExpr;
-	}
-	
-	public void setMemberExpr(ExprNode memberExpr) {
-		this.memberExpr = memberExpr;
-	}
-	
-	public void accept(ASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	
-	private Symbol symbol;
-	
-	public void setSymbol(Symbol symbol) {
-		this.symbol = symbol;
-	}
-	
-	public Symbol getSymbol() {
-		return symbol;
-	}
-}
+    private ExprNode expr;
+    private String id;
 
+    public MemberExprNode(String text, Location location, ExprNode expr, String id) {
+        super(text, location);
+        this.expr = expr;
+        this.id = id;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) throws CompileError {
+        visitor.visit(this);
+    }
+
+    public ExprNode getExpr() {
+        return expr;
+    }
+
+    public void setExpr(ExprNode expr) {
+        this.expr = expr;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+}

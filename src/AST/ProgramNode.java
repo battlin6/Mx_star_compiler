@@ -1,24 +1,27 @@
 package AST;
 
-import utility.Location; 
+import AST.Location.Location;
+import AST.NodeProperties.ASTNode;
+import AST.NodeProperties.DefUnitNode;
+import AST.Visit.ASTVisitor;
+import Semantic.ExceptionHandle.CompileError;
+
 import java.util.ArrayList;
 
 public class ProgramNode extends ASTNode {
-	private ArrayList<DefNode> defList;
-	
-	public ProgramNode(Location loc, ArrayList<DefNode> defList) {
-		super(loc);
-		this.defList = defList;
-	}
-	
-	public void addDef(DefNode def) {
-		defList.add(def);
-	}
-	
-	public ArrayList<DefNode> getDefList() {
-		return defList;
-	}
-	public void accept(ASTVisitor visitor) {
-		visitor.visit(this);
-	}
+    private ArrayList<DefUnitNode> defUnits;
+
+    public ProgramNode(String text, Location location, ArrayList<DefUnitNode> defUnits) {
+        super(text, location);
+        this.defUnits = defUnits;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) throws CompileError {
+        visitor.visit(this);
+    }
+
+    public ArrayList<DefUnitNode> getDefUnits() {
+        return defUnits;
+    }
 }

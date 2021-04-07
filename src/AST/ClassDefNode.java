@@ -1,50 +1,45 @@
 package AST;
 
-import utility.Location;
-import java.util.ArrayList;
-import Scope.ClassSymbol;
+import AST.Location.Location;
+import AST.NodeProperties.DefUnitNode;
+import AST.Visit.ASTVisitor;
+import Semantic.ExceptionHandle.CompileError;
 
-public class ClassDefNode extends DefNode {
-	private String identifier;
-	private ArrayList<VarDefListNode> varList;
-	private ArrayList<FunctDefNode> functList;
-	private FunctDefNode constructorDef;
-	
-	public ClassDefNode(Location loc, String identifier, ArrayList<VarDefListNode> varList, ArrayList<FunctDefNode> functList, FunctDefNode constructorDef) {
-		super(loc);
-		this.identifier = identifier;
-		this.varList = varList;
-		this.functList = functList;
-		this.constructorDef = constructorDef;
-	}
-	
-	public String getIdentifier() {
-		return identifier;
-	}
-	
-	public ArrayList<VarDefListNode> getVarList() {
-		return varList;
-	}
-	
-	public ArrayList<FunctDefNode> getFunctList() {
-		return functList;
-	}
-	
-	public FunctDefNode getConstructorDef() {
-		return constructorDef;
-	}
-	
-	public void accept(ASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	
-	private ClassSymbol classSymbol;
-	
-	public void setIRClass(ClassSymbol classSymbol) {
-		this.classSymbol = classSymbol;
-	}
-	
-	public ClassSymbol getClassSymbol() {
-		return classSymbol;
-	}
+import java.util.ArrayList;
+
+public class ClassDefNode extends DefUnitNode {
+    private String className;
+    private ArrayList<VarDefOneNode> varMembers;
+    private ArrayList<FuncDefNode> funcMembers;
+    private ConstructDefNode constructor;
+
+    public ClassDefNode(String text, Location location, String className, ArrayList<VarDefOneNode> varMembers,
+                        ArrayList<FuncDefNode> funcMembers, ConstructDefNode constructor) {
+        super(text, location);
+        this.className = className;
+        this.varMembers = varMembers;
+        this.funcMembers = funcMembers;
+        this.constructor = constructor;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) throws CompileError {
+        visitor.visit(this);
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public ArrayList<VarDefOneNode> getVarMembers() {
+        return varMembers;
+    }
+
+    public ArrayList<FuncDefNode> getFuncMembers() {
+        return funcMembers;
+    }
+
+    public ConstructDefNode getConstructor() {
+        return constructor;
+    }
 }

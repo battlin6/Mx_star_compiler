@@ -1,19 +1,27 @@
-package utility;
+package Utility;
 
-public class Pair<T1, T2> {
-	public T1 first;
-	public T2 second;
-	
-	public Pair(T1 first, T2 second) {
-		this.first = first;
-		this.second = second;
-	}
-	
-	public void setFirst(T1 first) {
-		this.first = first;
-	}
-	
-	public void setSecond(T2 second) {
-		this.second = second;
-	}
+public class Pair<FirstType, SecondType> {
+    private FirstType first;
+    private SecondType second;
+
+    public Pair(FirstType first, SecondType second) {
+        this.first = first;
+        this.second = second;
+    }
+
+    public FirstType getFirst() {
+        return first;
+    }
+
+    public SecondType getSecond() {
+        return second;
+    }
+
+    public void setFirst(FirstType first) {
+        this.first = first;
+    }
+
+    public void setSecond(SecondType second) {
+        this.second = second;
+    }
 }

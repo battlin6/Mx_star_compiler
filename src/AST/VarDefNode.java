@@ -1,49 +1,30 @@
 package AST;
 
-import Scope.VarSymbol;
+import AST.Location.Location;
+import AST.NodeProperties.DefUnitNode;
+import AST.Visit.ASTVisitor;
+import Semantic.ExceptionHandle.CompileError;
 
-import utility.Location;
+import java.util.ArrayList;
 
-public class VarDefNode extends ASTNode{
-	private TypeNode type;
-	private String identifier;
-	private ExprNode initValue;
-	
-	public VarDefNode(Location loc, TypeNode type, String identifier, ExprNode initValue) {
-		super(loc);
-		this.type = type;
-		this.identifier = identifier;
-		this.initValue = initValue;
-	}
+public class VarDefNode extends DefUnitNode {
+    private ArrayList<VarDefOneNode> varDefs;
 
-	public String getIdentifier() {
-		return identifier;
-	}
-	
-	public ExprNode getInitValue() {
-		return initValue;
-	}
-	
-	public TypeNode getType() {
-		return type;
-	}
-	
-	public void setType(TypeNode type) {
-		this.type = type;
-	}
-	
-	public void accept(ASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	
-	private VarSymbol varSymbol;
-	
-	public void setVarSymbol(VarSymbol varSymbol) {
-		this.varSymbol = varSymbol;
-	}
-	
-	public VarSymbol getVarSymbol() {
-		return varSymbol;
-	}
+    public VarDefNode(String text, Location location, ArrayList<VarDefOneNode> varDefs) {
+        super(text, location);
+        this.varDefs = varDefs;
+    }
 
+    public ArrayList<VarDefOneNode> getVarDefs() {
+        return this.varDefs;
+    }
+
+    public void setVarDefs(ArrayList<VarDefOneNode> varDefs) {
+        this.varDefs = varDefs;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) throws CompileError {
+        visitor.visit(this);
+    }
 }

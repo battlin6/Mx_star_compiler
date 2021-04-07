@@ -1,103 +1,60 @@
-	.text
+    .text
 
-	.globl  qpow
-	.p2align	2
-	.type   qpow, @function
-qpow:
-	sw      a0,0(t6)
-	sw      a1,0(t6)
-	sw      a2,0(t6)
-	li      t1,1
-	sw      t1,0(t6)
-	lw      t1,0(t6)
-	sw      t1,0(t6)
-	j       qpow_whileCondBlock.0
+    .globl    qpow                    # -- Begin function qpow
+    .p2align    2
+qpow:                           # @qpow
+.ASMBlock1_0:                           # initBlock.0
+	addi	a3, zero, 1
+	j	.ASMBlock1_1
+.ASMBlock1_1:                           # while$cond.0
+	ble	a1, zero, .ASMBlock1_6
+	j	.ASMBlock1_2
+.ASMBlock1_2:                           # while$body.0
+	andi	a4, a1, 1
+	addi	a5, zero, 1
+	bne	a4, a5, .ASMBlock1_4
+	j	.ASMBlock1_3
+.ASMBlock1_3:                           # ifThenBlock.0
+	mul	a3, a3, a0
+	rem	a3, a3, a2
+	j	.ASMBlock1_5
+.ASMBlock1_4:                           # criticalBlock.0
+	j	.ASMBlock1_5
+.ASMBlock1_5:                           # ifMergeBlock.0
+	mul	a0, a0, a0
+	rem	a0, a0, a2
+	addi	a4, zero, 2
+	div	a1, a1, a4
+	j	.ASMBlock1_1
+.ASMBlock1_6:                           # while$merge.0
+	mv	a0, a3
+	ret
+                                        # -- End function
 
-qpow_whileCondBlock.0:
-	lw      t1,0(t6)
-	li      t5,0
-	bgt     t1,t5,qpow_whileBodyBlock.0
-	j       qpow_afterWhileBlock.0
+    .globl    main                    # -- Begin function main
+    .p2align    2
+main:                           # @main
+.ASMBlock2_0:                           # initBlock.0
+	addi	sp, sp, -4
+	sw	ra, 0(sp)
+	addi	a0, zero, 2
+	addi	a1, zero, 10
+	li	a2, 10000
+	call	qpow
+	call	toString
+	call	println
+	mv	a0, zero
+	lw	ra, 0(sp)
+	addi	sp, sp, 4
+	ret
+                                        # -- End function
 
-qpow_whileBodyBlock.0:
-	j       qpow_ifCondBlock.0
-
-qpow_afterWhileBlock.0:
-	lw      t1,0(t6)
-	sw      t1,0(t6)
-	j       qpow_returnBlock.0
-
-qpow_ifCondBlock.0:
-	lw      t1,0(t6)
-	andi    t5,t1,1
-	li      t1,1
-	beq     t5,t1,qpow_thenBodyBlock.0
-	j       qpow_afterIfBlock.0
-
-qpow_thenBodyBlock.0:
-	lw      t1,0(t6)
-	lw      t1,0(t6)
-	lw      t5,0(t6)
-	mul     t1,t1,t5
-	lw      t5,0(t6)
-	rem     t1,t1,t5
-	sw      t1,0(t6)
-	j       qpow_afterIfBlock.0
-
-qpow_afterIfBlock.0:
-	lw      t1,0(t6)
-	lw      t5,0(t6)
-	lw      t1,0(t6)
-	mul     t5,t5,t1
-	lw      t1,0(t6)
-	rem     t1,t5,t1
-	sw      t1,0(t6)
-	lw      t1,0(t6)
-	lw      t5,0(t6)
-	li      t1,2
-	div     t1,t5,t1
-	sw      t1,0(t6)
-	j       qpow_whileCondBlock.0
-
-qpow_returnBlock.0:
-	lw      a0,0(t6)
-	jr      ra
+    .globl    __init__                # -- Begin function __init__
+    .p2align    2
+__init__:                       # @__init__
+.ASMBlock3_0:                           # initBlock.0
+	ret
+                                        # -- End function
 
 
-	.globl  main
-	.p2align	2
-	.type   main, @function
-main:
-	addi    sp,sp,-16
-	sw      ra,12(sp)
-	mv      t6,s0
-	sw      t6,8(sp)
-	call    __init__
-	li      a0,2
-	li      a1,10
-	li      a2,10000
-	call    qpow
-	call    __toString
-	call    __println
-	li      t6,0
-	sw      t6,0(s0)
-	j       main_returnBlock.0
-
-main_returnBlock.0:
-	lw      a0,0(s0)
-	lw      s0,8(sp)
-	lw      ra,12(sp)
-	addi    sp,sp,16
-	jr      ra
-
-
-	.globl  __init__
-	.p2align	2
-	.type   __init__, @function
-__init__:
-	j       __init___returnBlock.0
-
-__init___returnBlock.0:
-	jr      ra
-
-
+    .section	.sdata,"aw",@progbits

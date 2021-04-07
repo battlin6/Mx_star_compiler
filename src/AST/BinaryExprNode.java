@@ -1,77 +1,49 @@
 package AST;
 
-import utility.Location;
-import utility.Operator;
+import AST.Location.Location;
+import AST.NodeProperties.ExprNode;
+import AST.Visit.ASTVisitor;
+import Semantic.ExceptionHandle.CompileError;
 
 public class BinaryExprNode extends ExprNode {
-	private Operator op;
-	private ExprNode left, right;
-	
-	public BinaryExprNode(Location loc, Operator op, ExprNode left, ExprNode right) {
-		super(loc);
-		this.op = op;
-		this.left = left;
-		this.right = right;
-	}
-	
-	public Operator getOp() {
-		return op;
-	}
-	
-	public ExprNode getLeft() {
-		return left;
-	}
-	
-	public ExprNode getRight() {
-		return right;
-	}
-	
-	/*
-	public String opToString() {
-		if (op == Operator.MUL)
-			return new String("*");
-		else if (op == Operator.DIV)
-			return new String("/");
-		else if (op == Operator.MOD) 
-			return new String("%");
-		else if (op == Operator.ADD)
-			return new String("+");
-		else if (op == Operator.SUB)
-			return new String("-");
-		else if (op == Operator.leftSHIFT)
-			return new String("<<");
-		else if (op == Operator.rightSHIFT)
-			return new String(">>");
-		else if (op == Operator.LESS)
-			return new String("<");
-		else if (op == Operator.GREATER)
-			return new String(">");
-		else if (op == Operator.lessEQU)
-			return new String("<=");
-		else if (op == Operator.greaterEQU)
-			return new String(">=");
-		else if (op == Operator.EQU)
-			return new String("==");
-		else if (op == Operator.notEQU)
-			return new String("!=");
-		else if (op == Operator.bitwiseAND)
-			return new String("&");
-		else if (op == Operator.bitwiseXOR)
-			return new String("^");
-		else if (op == Operator.bitwiseOR)
-			return new String("|");
-		else if (op == Operator.logicalAND)
-			return new String("&&");
-		else if (op == Operator.logicalOR)
-			return new String("||");
-		else if (op == Operator.ASSIGN)
-			return new String("=");
-		else 
-			return new String("");
-	}
-	*/
-	
-	public void accept(ASTVisitor visitor) {
-		visitor.visit(this);
-	}
+    private ExprNode lhs;
+    private ExprNode rhs;
+    private String op;
+
+
+    public BinaryExprNode(String text, Location location, ExprNode lhs, ExprNode rhs, String op) {
+        super(text, location);
+        this.lhs = lhs;
+        this.rhs = rhs;
+        this.op = op;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) throws CompileError {
+        visitor.visit(this);
+    }
+
+    public ExprNode getLhs() {
+        return lhs;
+    }
+
+    public void setLhs(ExprNode lhs) {
+        this.lhs = lhs;
+    }
+
+    public ExprNode getRhs() {
+        return rhs;
+    }
+
+    public void setRhs(ExprNode rhs) {
+        this.rhs = rhs;
+    }
+
+    public String getOp() {
+        return op;
+    }
+
+    public void setOp(String op) {
+        this.op = op;
+    }
 }
