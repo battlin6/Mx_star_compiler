@@ -63,10 +63,13 @@ public class Main {
 
         if(args[args.length-1].equals("codegen")){
             try{
+                SSAConstructor ssaConstructor = new SSAConstructor(module);
+                ssaConstructor.run();
 
+                InlineExpansion inlineExpansion = new InlineExpansion(module);
 //                IRPrinter irPrinter = new IRPrinter("IRout.txt");
 //                irPrinter.visit(module);
-
+                new SSADestructor(module).run();
                 InstructionSelector instructionSelector = new InstructionSelector();
                 module.accept(instructionSelector);
                 ASMModule ASMRISCVModule = instructionSelector.getASMRISCVModule();
