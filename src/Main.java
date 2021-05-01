@@ -1,9 +1,9 @@
 import AST.ProgramNode;
 import AST.Visit.ASTBuilder;
-import BackEnd.ASMModule;
 import BackEnd.ASMPrinter;
 import BackEnd.Construct.InstructionSelector;
 import BackEnd.Construct.RegisterAllocate.RegisterAllocator;
+import BackEnd.ASMModule;
 import IR.IRBuilder;
 import IR.Module;
 import Optimization.*;
@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -27,7 +28,7 @@ public class Main {
         ExceptionListener exceptionListener = new ExceptionListener();
 
         InputStream is = System.in;
-        //is = new FileInputStream("test/test.txt");
+        is = new FileInputStream("test/test.txt");
         ANTLRInputStream input = new ANTLRInputStream(is);
 
         MXgrammarLexer lexer = new MXgrammarLexer(input);
@@ -62,7 +63,7 @@ public class Main {
 //        IRPrinter irPrinter = new IRPrinter("out.ll");
 //        irPrinter.visit(irBuilder.getModule());
 
-        if(args[args.length-1].equals("codegen")){
+        //if(args[args.length-1].equals("codegen")){
             try{
                 CFGSimplifier cfgOptim = new CFGSimplifier(module);
                 cfgOptim.run();
@@ -113,6 +114,6 @@ public class Main {
             }
         }
 
-    }
+   // }
 
 }

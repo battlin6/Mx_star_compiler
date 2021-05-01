@@ -1,9 +1,8 @@
 // Generated from D:/Code/Compiler/mynext2/src\MXgrammar.g4 by ANTLR 4.8
 package Semantic.ParserAndLexer;
-
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 

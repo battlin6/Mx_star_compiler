@@ -1,7 +1,11 @@
 package IR.LLVMoperand;
 
+import IR.Instruction.LLVMInstruction;
 import IR.TypeSystem.LLVMIntType;
 import IR.TypeSystem.LLVMtype;
+
+import java.util.Queue;
+import java.util.Set;
 
 public class ConstInt extends Operand implements Constant{
     private long value;

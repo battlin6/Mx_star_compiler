@@ -1,10 +1,7 @@
 package Optimization;
 
 import IR.Block;
-import IR.Instruction.BranchInst;
-import IR.Instruction.CallInst;
-import IR.Instruction.LLVMInstruction;
-import IR.Instruction.ReturnInst;
+import IR.Instruction.*;
 import IR.LLVMfunction;
 import IR.LLVMoperand.Operand;
 import IR.LLVMoperand.Register;

@@ -20,7 +20,7 @@ import Utility.Pair;
 import java.util.*;
 
 public class IRBuilder extends ASTVisitor {
-    private java.lang.Module module;
+    private Module module;
     private LLVMfunction currentFunction;
     private Block currentBlock;
     private boolean globalScope;
@@ -30,7 +30,7 @@ public class IRBuilder extends ASTVisitor {
 
 
     public IRBuilder(SemanticCheck semanticCheck) throws CompileError {
-        module = new java.lang.Module();
+        module = new Module();
         TypeTable astTypeTable = semanticCheck.getTypeTable();
         module.initTypeMap(astTypeTable);
         module.initTypeConstructor(astTypeTable);
@@ -1250,7 +1250,7 @@ public class IRBuilder extends ASTVisitor {
         node.setAllocAddr(null);//gugu changed ????
     }
 
-    public java.lang.Module getModule() {
+    public Module getModule() {
         return module;
     }
 }

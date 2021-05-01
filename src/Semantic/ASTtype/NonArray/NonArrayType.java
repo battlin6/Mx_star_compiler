@@ -2,8 +2,8 @@ package Semantic.ASTtype.NonArray;
 
 
 import AST.Function.Function;
-import Semantic.ASTtype.Type;
 import Semantic.ExceptionHandle.CompileError;
+import Semantic.ASTtype.Type;
 
 import java.util.HashMap;
 

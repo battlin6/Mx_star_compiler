@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public interface IRVisitor {
 
-    void visit(java.lang.Module module) throws IOException;
+    void visit(Module module) throws IOException;
 
     void visit(LLVMfunction function);
 
