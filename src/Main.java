@@ -63,7 +63,7 @@ public class Main {
 //        IRPrinter irPrinter = new IRPrinter("out.ll");
 //        irPrinter.visit(irBuilder.getModule());
 
-        //if(args[args.length-1].equals("codegen")){
+        if(args[args.length-1].equals("codegen")){
             try{
                 CFGSimplifier cfgOptim = new CFGSimplifier(module);
                 cfgOptim.run();
@@ -114,7 +114,7 @@ public class Main {
             }
         }
 
-   // }
+    }
 
 }
 
