@@ -7,6 +7,7 @@ import BackEnd.Construct.RegisterAllocate.RegisterAllocator;
 import IR.IRBuilder;
 import IR.Module;
 import Optimization.*;
+import Optimization.ConstOptim.ConstPropagation;
 import Semantic.ExceptionHandle.CompileError;
 import Semantic.ExceptionHandle.ExceptionListener;
 import Semantic.ParserAndLexer.MXgrammarLexer;
@@ -63,17 +64,46 @@ public class Main {
 
         if(args[args.length-1].equals("codegen")){
             try{
+                CFGSimplifier cfgOptim = new CFGSimplifier(module);
+                cfgOptim.run();
+                DTreeConstructor dTreeConstructor = new DTreeConstructor(module);
+                dTreeConstructor.run();
                 SSAConstructor ssaConstructor = new SSAConstructor(module);
                 ssaConstructor.run();
 
+                DCE DCE = new DCE(module);
+                ConstPropagation constPropagation = new ConstPropagation(module);
                 InlineExpansion inlineExpansion = new InlineExpansion(module);
+                int optimizeCnt = 0;
+                while(true){
+                    optimizeCnt++;
+                    boolean changed = false;
+                    dTreeConstructor.run();
+                    changed |= constPropagation.run();
+                    changed |= DCE.run();
+                    changed |= cfgOptim.run();
+//                    if(optimizeCnt == 1){
+//                        IRPrinter irPrinter = new IRPrinter("preInline.txt");
+//                        irPrinter.visit(module);
+//                    }
+//                    changed |= inlineExpansion.run();
+//                    if(optimizeCnt == 1){
+//                        IRPrinter irPrinter = new IRPrinter("afterInline.txt");
+//                        irPrinter.visit(module);
+//                    }
+                    changed |= cfgOptim.run();
+                    if (!changed)
+                        break;
+                }
 //                IRPrinter irPrinter = new IRPrinter("IRout.txt");
 //                irPrinter.visit(module);
+
                 new SSADestructor(module).run();
                 InstructionSelector instructionSelector = new InstructionSelector();
                 module.accept(instructionSelector);
                 ASMModule ASMRISCVModule = instructionSelector.getASMRISCVModule();
 
+                dTreeConstructor.run();
 
                 new RegisterAllocator(ASMRISCVModule, module).run();
                 new ASMPrinter("output.s").run(ASMRISCVModule);
