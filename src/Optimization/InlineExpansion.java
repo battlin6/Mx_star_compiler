@@ -12,8 +12,8 @@ import Utility.Pair;
 import java.util.*;
 
 public class InlineExpansion extends IRPass {
-    private final int instructionLimit = 200;
-    private final int inlineDepth = 3;
+    private final int instructionLimit = 100;
+    private final int inlineDepth = 4;
     private Map<LLVMfunction, Integer> instructionCount;
     private Map<LLVMfunction, Set<LLVMfunction>> recursiveCalleeMap;
 
