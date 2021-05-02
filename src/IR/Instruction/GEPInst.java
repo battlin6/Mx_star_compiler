@@ -14,7 +14,7 @@ import Optimization.SideEffectChecker;
 
 import java.util.*;
 
-public class GEPInst extends LLVMInstruction{
+public class GEPInst extends LLVMInstruction {
     private Operand pointer;    //gugu changed: why operand?? ans: register or GlobarVar??
     private ArrayList<Operand> indexs;
     private Register result;
@@ -36,7 +36,7 @@ public class GEPInst extends LLVMInstruction{
         string.append(result.toString() + " = ");
         string.append("getelementptr " + baseType.toString() + ", " +
                 pointerType.toString() + " " + pointer.toString());
-        for(Operand index : indexs){
+        for (Operand index : indexs) {
             string.append(", " + index.getLlvMtype().toString() + " " + index.toString());
         }
         return string.toString();
@@ -46,22 +46,22 @@ public class GEPInst extends LLVMInstruction{
     public void removeFromBlock() {
         super.removeFromBlock();
         pointer.removeUse(this);
-        for(Operand index : indexs)
+        for (Operand index : indexs)
             index.removeUse(this);
     }
 
     @Override
     public void overrideObject(Object oldUse, Object newUse) {
         ListIterator<Operand> listIterator = indexs.listIterator();
-        while(listIterator.hasNext()){
+        while (listIterator.hasNext()) {
             Operand index = listIterator.next();
-            if(index == oldUse){
+            if (index == oldUse) {
                 index.removeUse(this);
                 listIterator.set((Operand) newUse);
                 ((Operand) newUse).addUse(this);
             }
         }
-        if(pointer == oldUse){
+        if (pointer == oldUse) {
             pointer.removeUse(this);
             pointer = (Operand) newUse;
             pointer.addUse(this);

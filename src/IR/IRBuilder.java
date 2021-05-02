@@ -25,7 +25,7 @@ public class IRBuilder extends ASTVisitor {
     private Block currentBlock;
     private boolean globalScope;
     private String inClassName;
-    private Stack<Block> loopBreakStack;    //only record the peak is enough
+    private Stack<Block> loopBreakStack;
     private Stack<Block> loopContinueStack;
 
 
@@ -37,11 +37,11 @@ public class IRBuilder extends ASTVisitor {
         module.initTypeMethod(astTypeTable);
         //init normal funtion and built_in function
         HashMap<String, Function> globalFunctionTable = semanticCheck.getFunctionTable().getGlobalTable();
-        for(String functionName : globalFunctionTable.keySet()){
+        for (String functionName : globalFunctionTable.keySet()) {
             Function function = globalFunctionTable.get(functionName);
-            if(function.getCategory() == Function.Category.Normal)
+            if (function.getCategory() == Function.Category.Normal)
                 module.initNormalFunction(functionName, function);
-            else if(function.getCategory() == Function.Category.BuiltIn){
+            else if (function.getCategory() == Function.Category.BuiltIn) {
 
             }
         }
@@ -57,13 +57,13 @@ public class IRBuilder extends ASTVisitor {
     @Override
     public void visit(ProgramNode node) throws CompileError {
         //globalInitializer
-        globalScope= true;
+        globalScope = true;
         LLVMfunction globalInitializer = module.getFunctionMap().get("__init__");
         currentFunction = globalInitializer;
         currentBlock = currentFunction.getInitBlock();
         currentFunction.registerBlock(currentBlock.getName(), currentBlock);
-        for(var defUnitNode : node.getDefUnits()){
-            if(defUnitNode instanceof VarDefNode){
+        for (var defUnitNode : node.getDefUnits()) {
+            if (defUnitNode instanceof VarDefNode) {
                 defUnitNode.accept(this);
             }
         }
@@ -73,13 +73,13 @@ public class IRBuilder extends ASTVisitor {
         globalScope = false;
 
 
-        for(LLVMInstruction llvmInstruction : module.getDefineGlobals()){
+        for (LLVMInstruction llvmInstruction : module.getDefineGlobals()) {
             //currentBlock.addInstruction(llvmInstruction);
         }
 
         inClassName = null;
-        for(var defUnitNode : node.getDefUnits()){
-            if(defUnitNode instanceof FuncDefNode){
+        for (var defUnitNode : node.getDefUnits()) {
+            if (defUnitNode instanceof FuncDefNode) {
                 defUnitNode.accept(this);
             }
         }
@@ -89,8 +89,8 @@ public class IRBuilder extends ASTVisitor {
         currentBlock = currentFunction.getInitBlock();
         currentBlock.addInstFront(new CallInst(currentBlock, null, globalInitializer, new ArrayList<>()));
 
-        for(var defUnitNode : node.getDefUnits()){
-            if(defUnitNode instanceof ClassDefNode){
+        for (var defUnitNode : node.getDefUnits()) {
+            if (defUnitNode instanceof ClassDefNode) {
                 defUnitNode.accept(this);
             }
         }
@@ -110,43 +110,43 @@ public class IRBuilder extends ASTVisitor {
     @Override
     public void visit(VarDefNode node) throws CompileError {
         ArrayList<VarDefOneNode> varDefs = node.getVarDefs();
-        for(VarDefOneNode varDef : varDefs){
+        for (VarDefOneNode varDef : varDefs) {
             varDef.accept(this);
         }
     }
 
     @Override
     public void visit(VarDefOneNode node) {
-        try{
+        try {
             Type astType = node.getTypeNode().getType();
             LLVMtype llvMtype = astType.convert2LLVM(module.getTypeMap());
             String id = node.getId();
             VariableEntity variableEntity = node.getVariableEntity();
             ExprNode initNode = node.getInitValue();
-            if(globalScope){
+            if (globalScope) {
                 GlobalVar globalVar = new GlobalVar(new LLVMPointerType(llvMtype), id);
                 Operand initOperand;
-                if(initNode != null){
+                if (initNode != null) {
                     initNode.accept(this);
                     initOperand = initNode.getResult();
-                    if(!initOperand.isConst()){
+                    if (!initOperand.isConst()) {
                         currentBlock.addInst(new StoreInst(currentBlock, initOperand, globalVar));
                         initOperand = astType.getDefaultValue();
                     }
-                }else{
+                } else {
                     initOperand = astType.getDefaultValue();                //gugu changed the default value of ast can be combined to IR
                 }
                 DefineGlobal defineGlobal = new DefineGlobal(globalVar, initOperand);
                 module.getDefineGlobals().add(defineGlobal);
                 variableEntity.setAllocAddr(globalVar);
-            }else{
+            } else {
                 Register allocAddr = new Register(new LLVMPointerType(llvMtype), id + "$addr");
                 currentFunction.registerVar(allocAddr.getName(), allocAddr);
                 Block initBlock = currentFunction.getInitBlock();
                 initBlock.addInstFront(new StoreInst(initBlock, astType.getDefaultValue(), allocAddr));   //gugu changed:why reverse
                 initBlock.addInstFront(new AllocInst(initBlock, allocAddr, llvMtype));
                 variableEntity.setAllocAddr(allocAddr);
-                if(initNode != null){
+                if (initNode != null) {
                     initNode.accept(this);
                     Operand initOperand = initNode.getResult();
                     currentBlock.addInst(new StoreInst(currentBlock, initOperand, allocAddr));
@@ -161,7 +161,7 @@ public class IRBuilder extends ASTVisitor {
     @Override
     public void visit(FuncDefNode node) throws CompileError {
         String functionName = node.getFuncName();
-        if(inClassName != null)
+        if (inClassName != null)
             functionName = inClassName + "$" + functionName;
         LLVMfunction llvMfunction = module.getFunctionMap().get(functionName);
         currentFunction = llvMfunction;
@@ -179,9 +179,9 @@ public class IRBuilder extends ASTVisitor {
     @Override
     public void visit(ClassDefNode node) throws CompileError {
         this.inClassName = node.getClassName();
-        if(node.getConstructor() != null)
+        if (node.getConstructor() != null)
             node.getConstructor().accept(this);
-        for(var method : node.getFuncMembers()){
+        for (var method : node.getFuncMembers()) {
             method.accept(this);
         }
     }
@@ -204,7 +204,7 @@ public class IRBuilder extends ASTVisitor {
 
     @Override
     public void visit(BlockNode node) throws CompileError {
-        for(StatementNode statementNode : node.getStatements()){
+        for (StatementNode statementNode : node.getStatements()) {
             statementNode.accept(this);
         }
     }
@@ -216,7 +216,7 @@ public class IRBuilder extends ASTVisitor {
 
     @Override
     public void visit(IfNode node) throws CompileError {
-        if(node.getElse_st() != null){
+        if (node.getElse_st() != null) {
             Block thenBlock = new Block("ifThenBlock", currentFunction);
             Block elseBlock = new Block("ifElseBlock", currentFunction);
             Block mergeBlock = new Block("ifMergeBlock", currentFunction);
@@ -240,7 +240,7 @@ public class IRBuilder extends ASTVisitor {
 
             //mergeBlock
             currentBlock = mergeBlock;
-        }else{
+        } else {
             Block thenBlock = new Block("ifThenBlock", currentFunction);
             Block mergeBlock = new Block("ifMergeBlock", currentFunction);
             currentFunction.registerBlock(thenBlock.getName(), thenBlock);
@@ -264,7 +264,7 @@ public class IRBuilder extends ASTVisitor {
     @Override
     public void visit(WhileNode node) throws CompileError {
         Block whileCond = new Block("while$cond", currentFunction);
-        currentFunction.registerBlock(whileCond.getName(),whileCond);
+        currentFunction.registerBlock(whileCond.getName(), whileCond);
         Block whileBody = new Block("while$body", currentFunction);
         currentFunction.registerBlock(whileBody.getName(), whileBody);
         Block whileMerge = new Block("while$merge", currentFunction);
@@ -291,20 +291,20 @@ public class IRBuilder extends ASTVisitor {
     @Override
     public void visit(ForNode node) throws CompileError {
         //forInit
-        if(node.getFor_init() != null)
+        if (node.getFor_init() != null)
             node.getFor_init().accept(this);
         //
         Block forCond, forUpdate, forBody, forMerge;
-        if(node.getCond() != null){
+        if (node.getCond() != null) {
             forCond = new Block("forCond", currentFunction);
             currentFunction.registerBlock(forCond.getName(), forCond);
-        }else{
+        } else {
             forCond = null;
         }
-        if(node.getFor_update() != null){
+        if (node.getFor_update() != null) {
             forUpdate = new Block("forUpdate", currentFunction);
             currentFunction.registerBlock(forUpdate.getName(), forUpdate);
-        }else{
+        } else {
             forUpdate = null;
         }
         forBody = new Block("forBody", currentFunction);
@@ -312,7 +312,7 @@ public class IRBuilder extends ASTVisitor {
         forMerge = new Block("forMerge", currentFunction);
         currentFunction.registerBlock(forMerge.getName(), forMerge);
 
-        if(node.getCond() != null){
+        if (node.getCond() != null) {
             //forCond Block
             currentBlock.addInst(new BranchInst(currentBlock, null, forCond, null));
             currentBlock = forCond;
@@ -320,7 +320,7 @@ public class IRBuilder extends ASTVisitor {
             Operand condResult = node.getCond().getResult();
             currentBlock.addInst(new BranchInst(currentBlock, condResult, forBody, forMerge));
             //forBody Block
-            if(node.getFor_update() != null){
+            if (node.getFor_update() != null) {
                 loopContinueStack.push(forUpdate);
                 loopBreakStack.push(forMerge);
                 currentBlock = forBody;
@@ -332,7 +332,7 @@ public class IRBuilder extends ASTVisitor {
                 currentBlock = forUpdate;
                 node.getFor_update().accept(this);
                 currentBlock.addInst(new BranchInst(currentBlock, null, forCond, null));
-            }else{
+            } else {
                 loopContinueStack.push(forCond);
                 loopBreakStack.push(forMerge);
                 currentBlock = forBody;
@@ -341,10 +341,10 @@ public class IRBuilder extends ASTVisitor {
                 loopBreakStack.pop();
                 loopContinueStack.pop();
             }
-        }else{
+        } else {
             //forBody
             currentBlock.addInst(new BranchInst(currentBlock, null, forBody, null));
-            if(node.getFor_update() != null){
+            if (node.getFor_update() != null) {
                 loopContinueStack.push(forUpdate);
                 loopBreakStack.push(forMerge);
                 currentBlock = forBody;
@@ -356,7 +356,7 @@ public class IRBuilder extends ASTVisitor {
                 currentBlock = forUpdate;
                 node.getFor_update().accept(this);
                 currentBlock.addInst(new BranchInst(currentBlock, null, forBody, null));
-            }else{
+            } else {
                 loopContinueStack.push(forCond);///////////////////////////////////////////////////
                 loopBreakStack.push(forMerge);
                 currentBlock = forBody;
@@ -372,7 +372,7 @@ public class IRBuilder extends ASTVisitor {
 
     @Override
     public void visit(ReturnNode node) throws CompileError {
-        if(node.getReturnExpr() != null){
+        if (node.getReturnExpr() != null) {
             node.getReturnExpr().accept(this);
             Operand returnResult = node.getReturnExpr().getResult();
             currentBlock.addInst(new StoreInst(currentBlock, returnResult, currentFunction.getReturnAddr()));
@@ -406,7 +406,7 @@ public class IRBuilder extends ASTVisitor {
         LLVMtype thisSelfType = ((LLVMPointerType) thisAddr.getLlvMtype()).getBaseType();
         Register thisRegister = new Register(thisSelfType, "this");
         currentFunction.registerVar(thisRegister.getName(), thisRegister);
-        currentBlock.addInst(new LoadInst(currentBlock, thisAddr,thisRegister));
+        currentBlock.addInst(new LoadInst(currentBlock, thisAddr, thisRegister));
 
         node.setResult(thisRegister);
         node.setAllocAddr(null);
@@ -415,32 +415,33 @@ public class IRBuilder extends ASTVisitor {
     @Override
     public void visit(ConstExprNode node) throws CompileError {
         String constant = node.getConstant();
-        switch (constant.charAt(0)){
-            case'n':            //const null
+        switch (constant.charAt(0)) {
+            case 'n':            //const null
                 node.setResult(new ConstNull());
                 node.setAllocAddr(null);
                 break;
-            case't': case 'f':
+            case 't':
+            case 'f':
                 boolean flag;   //const bool
-                if(constant.equals("true"))
+                if (constant.equals("true"))
                     flag = true;
                 else
                     flag = false;
                 node.setResult(new ConstBool(flag));
                 node.setAllocAddr(null);
                 break;
-            case'"':            //const string
+            case '"':            //const string
                 //preprocess string
-                constant = constant.substring(1, constant.length()-1);
+                constant = constant.substring(1, constant.length() - 1);
                 constant = constant.replace("\\\\", "\\");
                 constant = constant.replace("\\n", "\n");
                 constant = constant.replace("\\\"", "\"");
                 constant = constant + "\0";
                 //fetch globalVar
                 GlobalVar globalVar;
-                if(module.getConstStringMap().containsKey(constant))
+                if (module.getConstStringMap().containsKey(constant))
                     globalVar = module.getConstStringMap().get(constant);
-                else{
+                else {
                     int id = module.getConstStringMap().size();
                     globalVar = new GlobalVar(
                             new LLVMPointerType(new LLVMArrayType(constant.length(), new LLVMIntType(LLVMIntType.BitWidth.int8))),
@@ -474,7 +475,7 @@ public class IRBuilder extends ASTVisitor {
     @Override
     public void visit(IdExprNode node) throws CompileError {
         Operand allocAddr = node.getVariableEntity().getAllocAddr();
-        if(allocAddr != null){
+        if (allocAddr != null) {
             //normal variable                                   funtion name????
             assert allocAddr.getLlvMtype() instanceof LLVMPointerType;
             LLVMtype loadType = ((LLVMPointerType) allocAddr.getLlvMtype()).getBaseType();
@@ -483,7 +484,7 @@ public class IRBuilder extends ASTVisitor {
             currentBlock.addInst(new LoadInst(currentBlock, allocAddr, result));
             node.setResult(result);
             node.setAllocAddr(allocAddr);
-        }else{
+        } else {
             Register thisAddr = currentFunction.getThisAddr();
             assert thisAddr.getLlvMtype() instanceof LLVMPointerType;
             //load 'this'
@@ -506,7 +507,7 @@ public class IRBuilder extends ASTVisitor {
             currentFunction.registerVar(memberAddr.getName(), memberAddr);
             currentBlock.addInst(new GEPInst(currentBlock, thisRegister, indexs, memberAddr));
             //load this.member
-            Register member = new Register(memberLlvmType, "member" + "$" +node.getId());
+            Register member = new Register(memberLlvmType, "member" + "$" + node.getId());
             currentFunction.registerVar(member.getName(), member);
             currentBlock.addInst(new LoadInst(currentBlock, memberAddr, member));
             //final
@@ -520,9 +521,9 @@ public class IRBuilder extends ASTVisitor {
         node.getExpr().accept(this);
         String name = node.getId();
         Operand faValue = node.getExpr().getResult();
-        assert  faValue.getLlvMtype() instanceof LLVMPointerType;
+        assert faValue.getLlvMtype() instanceof LLVMPointerType;
         LLVMtype faSelfType = ((LLVMPointerType) faValue.getLlvMtype()).getBaseType();
-        assert  faSelfType instanceof LLVMStructType;
+        assert faSelfType instanceof LLVMStructType;
         //init indexs
         int pos = ((LLVMStructType) faSelfType).getMemberIndexMap().get(name);
         ArrayList<Operand> indexs = new ArrayList<Operand>();
@@ -548,30 +549,31 @@ public class IRBuilder extends ASTVisitor {
         Operand exprResult = node.getExpr().getResult();
         Operand addr = node.getExpr().getAllocAddr();
         Register result;
-        switch (node.getOp()){
-            case "--":{
+        switch (node.getOp()) {
+            case "--": {
                 result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "postDec");
                 currentFunction.registerVar(result.getName(), result);
                 currentBlock.addInst(new BinaryOpInst(currentBlock, BinaryOpInst.BinaryOpName.sub, exprResult,
-                        new ConstInt(new LLVMIntType(LLVMIntType.BitWidth.int32),1),
+                        new ConstInt(new LLVMIntType(LLVMIntType.BitWidth.int32), 1),
                         result));
                 currentBlock.addInst(new StoreInst(currentBlock, result, addr));
                 node.setAllocAddr(null);
                 node.setResult(exprResult);
                 break;
             }
-            case "++":{
+            case "++": {
                 result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "postInc");
                 currentFunction.registerVar(result.getName(), result);
                 currentBlock.addInst(new BinaryOpInst(currentBlock, BinaryOpInst.BinaryOpName.add, exprResult,
-                        new ConstInt(new LLVMIntType(LLVMIntType.BitWidth.int32),1),
+                        new ConstInt(new LLVMIntType(LLVMIntType.BitWidth.int32), 1),
                         result));
                 currentBlock.addInst(new StoreInst(currentBlock, result, addr));
                 node.setAllocAddr(null);
                 node.setResult(exprResult);
                 break;
             }
-            default:assert false;
+            default:
+                assert false;
         }
 
     }
@@ -581,26 +583,26 @@ public class IRBuilder extends ASTVisitor {
         ArrayList<ExprNode> lenPerDim = node.getLenPerDim();
         Type astBaseType = node.getBaseType().getType();
         LLVMtype llvMtype = astBaseType.convert2LLVM(module.getTypeMap());
-        for(int i = 0; i< node.getDim(); i++){
+        for (int i = 0; i < node.getDim(); i++) {
             llvMtype = new LLVMPointerType(llvMtype);
         }
 
         ArrayList<Operand> sizeList = new ArrayList<>();
-        for(ExprNode len : lenPerDim){
+        for (ExprNode len : lenPerDim) {
             len.accept(this);
             sizeList.add(len.getResult());
         }
         //begin
-        Operand result = newArrayMalloc(0,sizeList,llvMtype);
+        Operand result = newArrayMalloc(0, sizeList, llvMtype);
         node.setResult(result);
         node.setAllocAddr(null);
 
     }
 
-    public Operand newArrayMalloc(int cur, ArrayList<Operand> sizeList, LLVMtype llvMtype){
+    public Operand newArrayMalloc(int cur, ArrayList<Operand> sizeList, LLVMtype llvMtype) {
         LLVMfunction function = module.getBuiltInFunctionMap().get("malloc");
-        ArrayList<Operand>paras = new ArrayList<>();
-        Register mallocResult = new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"malloc");
+        ArrayList<Operand> paras = new ArrayList<>();
+        Register mallocResult = new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "malloc");
         currentFunction.registerVar(mallocResult.getName(), mallocResult);
         int baseSize = llvMtype.getByte();
         //calculate size
@@ -635,7 +637,7 @@ public class IRBuilder extends ASTVisitor {
         currentBlock.addInst(new BitCastInst(currentBlock, arrayHeadInt32, llvMtype, arrayHead));
 
         //for next dimension
-        if(cur != sizeList.size()-1){
+        if (cur != sizeList.size() - 1) {
             Register arrayTail = new Register(llvMtype, "arrayTail");
             currentFunction.registerVar(arrayTail.getName(), arrayTail);
             indexs = new ArrayList<>();
@@ -713,11 +715,11 @@ public class IRBuilder extends ASTVisitor {
         currentBlock.addInst(new CallInst(currentBlock, mallocResult, mallocFunction, paras));
         //add bitcast instruction
         Register castResult = new Register(llvMtype, "castResult");
-        currentFunction.registerVar(castResult.getName(),castResult);
+        currentFunction.registerVar(castResult.getName(), castResult);
         currentBlock.addInst(new BitCastInst(currentBlock, mallocResult, castResult.getLlvMtype(), castResult));
         node.setResult(castResult);
         node.setAllocAddr(null);
-        if(astType.getConstructor().getCategory() != Function.Category.defaultConstructor){
+        if (astType.getConstructor().getCategory() != Function.Category.defaultConstructor) {
             String constructorName = ((ClassType) astType).getName() + "$" + ((ClassType) astType).getName();
             LLVMfunction constructor = module.getFunctionMap().get(constructorName);
             assert constructor != null;
@@ -732,24 +734,24 @@ public class IRBuilder extends ASTVisitor {
     public void visit(FuncExprNode node) throws CompileError {
         ExprNode funcSelf = node.getFuncSelf();
         LLVMfunction function;
-        if(funcSelf instanceof NewExprNode_nonArray){
+        if (funcSelf instanceof NewExprNode_nonArray) {
             funcSelf.accept(this);
             node.setAllocAddr(funcSelf.getAllocAddr());
             node.setResult(funcSelf.getResult());
-        }else if(funcSelf instanceof MemberExprNode){
+        } else if (funcSelf instanceof MemberExprNode) {
             ExprNode faNode = ((MemberExprNode) funcSelf).getExpr();
             faNode.accept(this);
             String name = ((MemberExprNode) funcSelf).getId();
             Type faType = faNode.getExprType();
             Operand faResult = faNode.getResult();
-            if(faType instanceof ArrayType){
+            if (faType instanceof ArrayType) {
                 /*for array.size ***************************************** maybe can deleted*/
                 Register pointer;
-                if(!faResult.getLlvMtype().equals(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int32)))){
+                if (!faResult.getLlvMtype().equals(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int32)))) {
                     pointer = new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int32)), "cast$result");
                     currentFunction.registerVar(pointer.getName(), pointer);
                     currentBlock.addInst(new BitCastInst(currentBlock, faResult, pointer.getLlvMtype(), pointer));
-                }else{
+                } else {
                     pointer = (Register) faResult;
                 }
                 //add GEP instruction
@@ -760,14 +762,14 @@ public class IRBuilder extends ASTVisitor {
                 currentBlock.addInst(new GEPInst(currentBlock, pointer, indexs, GEPresult));
                 //add load instruction
                 Register sizeResult = new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "size$result");
-                currentFunction.registerVar(sizeResult.getName(),sizeResult);
+                currentFunction.registerVar(sizeResult.getName(), sizeResult);
                 currentBlock.addInst(new LoadInst(currentBlock, GEPresult, sizeResult));
                 node.setResult(sizeResult);
                 node.setAllocAddr(null);
-            }else{
-                if(faType instanceof StringType){
+            } else {
+                if (faType instanceof StringType) {
                     function = module.getBuiltInFunctionMap().get("__string_" + name);
-                }else{
+                } else {
                     assert faType instanceof ClassType;
                     function = module.getFunctionMap().get(((ClassType) faType).getName() + "$" + name);
                 }
@@ -775,17 +777,17 @@ public class IRBuilder extends ASTVisitor {
                 //init para
                 ArrayList<Operand> paras = new ArrayList<Operand>();
                 paras.add(faResult);
-                for(ExprNode paraNode : node.getParas()){
+                for (ExprNode paraNode : node.getParas()) {
                     paraNode.accept(this);
                     paras.add(paraNode.getResult());
                 }
                 //void or not || add instrcution
                 LLVMtype returnType = function.getResultType();
-                if(returnType instanceof LLVMVoidType){
+                if (returnType instanceof LLVMVoidType) {
                     currentBlock.addInst(new CallInst(currentBlock, null, function, paras));
                     node.setResult(null);
                     node.setAllocAddr(null);
-                } else{
+                } else {
                     Register result = new Register(returnType, "call$result");
                     currentFunction.registerVar(result.getName(), result);
                     currentBlock.addInst(new CallInst(currentBlock, result, function, paras));
@@ -794,10 +796,10 @@ public class IRBuilder extends ASTVisitor {
                 }
 
             }
-        }else{
+        } else {
             assert funcSelf instanceof IdExprNode;
             String name = ((IdExprNode) funcSelf).getId();
-            if(!module.getFunctionMap().containsKey(name) && !module.getBuiltInFunctionMap().containsKey(name)){
+            if (!module.getFunctionMap().containsKey(name) && !module.getBuiltInFunctionMap().containsKey(name)) {
                 //method
                 function = module.getFunctionMap().get(inClassName + "$" + name);
                 assert function != null;
@@ -807,46 +809,46 @@ public class IRBuilder extends ASTVisitor {
                 currentFunction.registerVar(thisValue.getName(), thisValue);
                 currentBlock.addInst(new LoadInst(currentBlock, thisAddr, thisValue));
                 //init paras
-                ArrayList<Operand>paras = new ArrayList<Operand>();
+                ArrayList<Operand> paras = new ArrayList<Operand>();
                 paras.add(thisValue);
-                for(ExprNode paraNode : node.getParas()){
+                for (ExprNode paraNode : node.getParas()) {
                     paraNode.accept(this);
                     paras.add(paraNode.getResult());
                 }
                 //void or not || add instrcution
                 LLVMtype returnType = function.getResultType();
-                if(returnType instanceof LLVMVoidType){
+                if (returnType instanceof LLVMVoidType) {
                     currentBlock.addInst(new CallInst(currentBlock, null, function, paras));
                     node.setResult(null);
                     node.setAllocAddr(null);
-                } else{
+                } else {
                     Register result = new Register(returnType, "call$result");
                     currentFunction.registerVar(result.getName(), result);
                     currentBlock.addInst(new CallInst(currentBlock, result, function, paras));
                     node.setResult(result);
                     node.setAllocAddr(null);
                 }
-            }else{
+            } else {
                 //Normal Function
-                if(module.getBuiltInFunctionMap().containsKey(name))
+                if (module.getBuiltInFunctionMap().containsKey(name))
                     function = module.getBuiltInFunctionMap().get(name);
-                else{
+                else {
                     assert module.getFunctionMap().containsKey(name);
                     function = module.getFunctionMap().get(name);
                 }
                 //init paras
                 ArrayList<Operand> paras = new ArrayList<Operand>();
-                for(ExprNode paraNode : node.getParas()){
+                for (ExprNode paraNode : node.getParas()) {
                     paraNode.accept(this);
                     paras.add(paraNode.getResult());
                 }
                 //void or not || add instrcution
                 LLVMtype returnType = function.getResultType();
-                if(returnType instanceof LLVMVoidType){
+                if (returnType instanceof LLVMVoidType) {
                     currentBlock.addInst(new CallInst(currentBlock, null, function, paras));
                     node.setResult(null);
                     node.setAllocAddr(null);
-                } else{
+                } else {
                     Register result = new Register(returnType, "call$result");
                     currentFunction.registerVar(result.getName(), result);
                     currentBlock.addInst(new CallInst(currentBlock, result, function, paras));
@@ -883,7 +885,7 @@ public class IRBuilder extends ASTVisitor {
         node.getExpr().accept(this);
         String op = node.getOp();
         Operand exprResult = node.getExpr().getResult();
-        switch (op){
+        switch (op) {
             case "++": {
                 Operand exprAddr = node.getExpr().getAllocAddr();
                 Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "preIncrease");
@@ -895,7 +897,7 @@ public class IRBuilder extends ASTVisitor {
                 node.setAllocAddr(exprAddr);
                 break;
             }
-            case"--":{
+            case "--": {
                 Operand exprAddr = node.getExpr().getAllocAddr();
                 Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "preDecrease");
                 currentFunction.registerVar(result.getName(), result);
@@ -906,18 +908,18 @@ public class IRBuilder extends ASTVisitor {
                 node.setAllocAddr(exprAddr);
                 break;
             }
-            case"+":{
+            case "+": {
                 node.setResult(exprResult);
                 node.setAllocAddr(null);
                 break;
             }
-            case"-":{
-                if(exprResult.isConst()){
+            case "-": {
+                if (exprResult.isConst()) {
                     assert exprResult instanceof ConstInt;
                     node.setResult(new ConstInt(new LLVMIntType(LLVMIntType.BitWidth.int32),
                             -((ConstInt) exprResult).getValue()));
                     node.setAllocAddr(null);
-                }else{
+                } else {
                     Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "negValue");
                     currentFunction.registerVar(result.getName(), result);
                     currentBlock.addInst(new BinaryOpInst(currentBlock, BinaryOpInst.BinaryOpName.sub,
@@ -927,18 +929,18 @@ public class IRBuilder extends ASTVisitor {
                 }
                 break;
             }
-            case"!":{
+            case "!": {
                 Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int1), "notValue");
-                currentFunction.registerVar(result.getName(),result);
+                currentFunction.registerVar(result.getName(), result);
                 currentBlock.addInst(new BinaryOpInst(currentBlock, BinaryOpInst.BinaryOpName.xor,
                         new ConstBool(true), exprResult, result));
                 node.setResult(result);
                 node.setAllocAddr(null);
                 break;
             }
-            case"~":{
+            case "~": {
                 Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "bitwiseValue");
-                currentFunction.registerVar(result.getName(),result);
+                currentFunction.registerVar(result.getName(), result);
                 currentBlock.addInst(new BinaryOpInst(currentBlock, BinaryOpInst.BinaryOpName.xor,
                         new ConstInt(new LLVMIntType(LLVMIntType.BitWidth.int32), -1), exprResult, result));
                 node.setResult(result);
@@ -951,7 +953,7 @@ public class IRBuilder extends ASTVisitor {
     @Override
     public void visit(BinaryExprNode node) throws CompileError {    //gugu changed: the order can be reorganized e.g. string specific area
         String op = node.getOp();
-        if(!op.equals("&&") && !op.equals("||")){
+        if (!op.equals("&&") && !op.equals("||")) {
             //for int
             ExprNode lhs = node.getLhs();
             ExprNode rhs = node.getRhs();
@@ -959,40 +961,67 @@ public class IRBuilder extends ASTVisitor {
             rhs.accept(this);
             Operand lhsResult = lhs.getResult();
             Operand rhsResult = rhs.getResult();
-            switch (op){
-                case"*": case "/": case "%": case "-": case "<<": case ">>": case "&": case "^" : case "|":{
+            switch (op) {
+                case "*":
+                case "/":
+                case "%":
+                case "-":
+                case "<<":
+                case ">>":
+                case "&":
+                case "^":
+                case "|": {
                     String registerId = null;
                     BinaryOpInst.BinaryOpName binaryOpName = null;
-                    if(op.equals("*")){registerId = "mulValue"; binaryOpName = BinaryOpInst.BinaryOpName.mul;}
-                    else if(op.equals("/")){registerId = "divValue"; binaryOpName = BinaryOpInst.BinaryOpName.sdiv;}
-                    else if(op.equals("%")){registerId = "modValue"; binaryOpName = BinaryOpInst.BinaryOpName.srem;}
-                    else if(op.equals("-")){registerId = "subValue"; binaryOpName = BinaryOpInst.BinaryOpName.sub;}
-                    else if(op.equals("<<")){registerId = "shiftLeftValue"; binaryOpName = BinaryOpInst.BinaryOpName.shl;}
-                    else if(op.equals(">>")){registerId = "shiftRightValue"; binaryOpName = BinaryOpInst.BinaryOpName.ashr;}
-                    else if(op.equals("&")){registerId = "bitwiseAndValue"; binaryOpName = BinaryOpInst.BinaryOpName.and;}
-                    else if(op.equals("^")){registerId = "bitwiseXorValue"; binaryOpName = BinaryOpInst.BinaryOpName.xor;}
-                    else if(op.equals("|")){registerId = "bitwiseOrValue"; binaryOpName = BinaryOpInst.BinaryOpName.or;}
+                    if (op.equals("*")) {
+                        registerId = "mulValue";
+                        binaryOpName = BinaryOpInst.BinaryOpName.mul;
+                    } else if (op.equals("/")) {
+                        registerId = "divValue";
+                        binaryOpName = BinaryOpInst.BinaryOpName.sdiv;
+                    } else if (op.equals("%")) {
+                        registerId = "modValue";
+                        binaryOpName = BinaryOpInst.BinaryOpName.srem;
+                    } else if (op.equals("-")) {
+                        registerId = "subValue";
+                        binaryOpName = BinaryOpInst.BinaryOpName.sub;
+                    } else if (op.equals("<<")) {
+                        registerId = "shiftLeftValue";
+                        binaryOpName = BinaryOpInst.BinaryOpName.shl;
+                    } else if (op.equals(">>")) {
+                        registerId = "shiftRightValue";
+                        binaryOpName = BinaryOpInst.BinaryOpName.ashr;
+                    } else if (op.equals("&")) {
+                        registerId = "bitwiseAndValue";
+                        binaryOpName = BinaryOpInst.BinaryOpName.and;
+                    } else if (op.equals("^")) {
+                        registerId = "bitwiseXorValue";
+                        binaryOpName = BinaryOpInst.BinaryOpName.xor;
+                    } else if (op.equals("|")) {
+                        registerId = "bitwiseOrValue";
+                        binaryOpName = BinaryOpInst.BinaryOpName.or;
+                    }
                     if (registerId == null) throw new AssertionError();
                     if (binaryOpName == null) throw new AssertionError();
                     Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), registerId);
-                    currentFunction.registerVar(result.getName(),result);
+                    currentFunction.registerVar(result.getName(), result);
                     currentBlock.addInst(new BinaryOpInst(currentBlock, binaryOpName,
                             lhsResult, rhsResult, result));
                     node.setResult(result);
                     node.setAllocAddr(null);
                     break;
                 }
-                case "+":{
-                    if(rhs.getExprType() instanceof IntType){
+                case "+": {
+                    if (rhs.getExprType() instanceof IntType) {
                         assert lhs.getExprType() instanceof IntType;
                         Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "add");
-                        currentFunction.registerVar(result.getName(),result);
+                        currentFunction.registerVar(result.getName(), result);
                         currentBlock.addInst(new BinaryOpInst(currentBlock, BinaryOpInst.BinaryOpName.add,
                                 lhsResult, rhsResult, result));
                         node.setResult(result);
                         node.setAllocAddr(null);
                         break;
-                    }else{
+                    } else {
                         assert lhs.getExprType() instanceof StringType;
                         assert rhs.getExprType() instanceof StringType;
                         LLVMfunction function = module.getBuiltInFunctionMap().get("__string_concatenate");
@@ -1011,31 +1040,52 @@ public class IRBuilder extends ASTVisitor {
                         break;
                     }
                 }
-                case "<": case ">" : case "<=" : case ">=":{
-                    if(node.getRhs().getExprType() instanceof IntType){
+                case "<":
+                case ">":
+                case "<=":
+                case ">=": {
+                    if (node.getRhs().getExprType() instanceof IntType) {
                         String registeredId = null;
                         IcmpInst.IcmpName icmpName = null;
-                        if(op.equals("<")){registeredId = "lessThen"; icmpName = IcmpInst.IcmpName.slt;}
-                        else if(op.equals(">")){registeredId = "greaterThen"; icmpName = IcmpInst.IcmpName.sgt;}
-                        else if(op.equals("<=")){registeredId = "lessEqual"; icmpName = IcmpInst.IcmpName.sle;}
-                        else if(op.equals(">=")){registeredId = "greaterEqual"; icmpName = IcmpInst.IcmpName.sge;}
+                        if (op.equals("<")) {
+                            registeredId = "lessThen";
+                            icmpName = IcmpInst.IcmpName.slt;
+                        } else if (op.equals(">")) {
+                            registeredId = "greaterThen";
+                            icmpName = IcmpInst.IcmpName.sgt;
+                        } else if (op.equals("<=")) {
+                            registeredId = "lessEqual";
+                            icmpName = IcmpInst.IcmpName.sle;
+                        } else if (op.equals(">=")) {
+                            registeredId = "greaterEqual";
+                            icmpName = IcmpInst.IcmpName.sge;
+                        }
                         Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int1), registeredId);
-                        currentFunction.registerVar(result.getName(),result);
+                        currentFunction.registerVar(result.getName(), result);
                         currentBlock.addInst(new IcmpInst(currentBlock, icmpName,
                                 new LLVMIntType(LLVMIntType.BitWidth.int32),
                                 lhsResult, rhsResult, result));
                         node.setResult(result);
                         node.setAllocAddr(null);
                         break;
-                    }else{
+                    } else {
                         assert lhs.getExprType() instanceof StringType;
                         assert rhs.getExprType() instanceof StringType;
                         String registeredId = null;
                         String funtionName = null;
-                        if(op.equals("<")){registeredId = "stringLessThanResult"; funtionName = "__string_lessThan";}
-                        else if(op.equals(">")){registeredId = "stringGreaterThanResult"; funtionName = "__string_greaterThan";}
-                        else if(op.equals("<=")){registeredId = "stringLessEqualResult"; funtionName = "__string_lessEqual";}
-                        else if(op.equals(">=")){registeredId = "stringGreaterEqual"; funtionName = "__string_greaterEqual";}
+                        if (op.equals("<")) {
+                            registeredId = "stringLessThanResult";
+                            funtionName = "__string_lessThan";
+                        } else if (op.equals(">")) {
+                            registeredId = "stringGreaterThanResult";
+                            funtionName = "__string_greaterThan";
+                        } else if (op.equals("<=")) {
+                            registeredId = "stringLessEqualResult";
+                            funtionName = "__string_lessEqual";
+                        } else if (op.equals(">=")) {
+                            registeredId = "stringGreaterEqual";
+                            funtionName = "__string_greaterEqual";
+                        }
                         LLVMfunction function = module.getBuiltInFunctionMap().get(funtionName);
                         //init para
                         ArrayList<Operand> paras = new ArrayList<Operand>();
@@ -1051,10 +1101,10 @@ public class IRBuilder extends ASTVisitor {
                         break;
                     }
                 }
-                case "==":{
+                case "==": {
                     Type ltype = lhs.getExprType();
                     Type rtype = rhs.getExprType();
-                    if(ltype instanceof IntType && rtype instanceof IntType){
+                    if (ltype instanceof IntType && rtype instanceof IntType) {
                         Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int1), "equal");
                         currentFunction.registerVar(result.getName(), result);
                         currentBlock.addInst(new IcmpInst(currentBlock, IcmpInst.IcmpName.eq,
@@ -1063,7 +1113,7 @@ public class IRBuilder extends ASTVisitor {
                         node.setResult(result);
                         node.setAllocAddr(null);
                         break;
-                    }else if(ltype instanceof BoolType && rtype instanceof BoolType){
+                    } else if (ltype instanceof BoolType && rtype instanceof BoolType) {
                         Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int1), "equal");
                         currentFunction.registerVar(result.getName(), result);
                         currentBlock.addInst(new IcmpInst(currentBlock, IcmpInst.IcmpName.eq,
@@ -1072,7 +1122,7 @@ public class IRBuilder extends ASTVisitor {
                         node.setResult(result);
                         node.setAllocAddr(null);
                         break;
-                    }else if(ltype instanceof StringType && rtype instanceof StringType){
+                    } else if (ltype instanceof StringType && rtype instanceof StringType) {
                         LLVMfunction mfunction = module.getBuiltInFunctionMap().get("__string_equal");
                         //init paras
                         ArrayList<Operand> paras = new ArrayList<Operand>();
@@ -1086,10 +1136,10 @@ public class IRBuilder extends ASTVisitor {
                         node.setResult(result);
                         node.setAllocAddr(null);
                         break;
-                    }else if((ltype instanceof ArrayType && rtype instanceof NullType)
+                    } else if ((ltype instanceof ArrayType && rtype instanceof NullType)
                             || (ltype instanceof NullType && rtype instanceof ArrayType)
                             || (ltype instanceof ClassType && rtype instanceof NullType)
-                            || (ltype instanceof NullType && rtype instanceof ClassType)){
+                            || (ltype instanceof NullType && rtype instanceof ClassType)) {
                         Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int1), "equalResult");
                         currentFunction.registerVar(result.getName(), result);
                         LLVMtype compareType = rtype instanceof NullType ? lhsResult.getLlvMtype() : rhsResult.getLlvMtype();
@@ -1099,16 +1149,16 @@ public class IRBuilder extends ASTVisitor {
                         node.setResult(result);
                         node.setAllocAddr(null);
                         break;
-                    }else if(ltype instanceof NullType && rtype instanceof  NullType){
+                    } else if (ltype instanceof NullType && rtype instanceof NullType) {
                         node.setResult(new ConstBool(true));
                         node.setLvalue(null);
                         break;
                     }
                 }
-                case "!=":{
+                case "!=": {
                     Type ltype = lhs.getExprType();
                     Type rtype = rhs.getExprType();
-                    if(ltype instanceof IntType && rtype instanceof IntType){
+                    if (ltype instanceof IntType && rtype instanceof IntType) {
                         Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int1), "notEqual");
                         currentFunction.registerVar(result.getName(), result);
                         currentBlock.addInst(new IcmpInst(currentBlock, IcmpInst.IcmpName.ne,
@@ -1117,7 +1167,7 @@ public class IRBuilder extends ASTVisitor {
                         node.setResult(result);
                         node.setAllocAddr(null);
                         break;
-                    }else if(ltype instanceof BoolType && rtype instanceof BoolType){
+                    } else if (ltype instanceof BoolType && rtype instanceof BoolType) {
                         Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int1), "notEqual");
                         currentFunction.registerVar(result.getName(), result);
                         currentBlock.addInst(new IcmpInst(currentBlock, IcmpInst.IcmpName.ne,
@@ -1126,7 +1176,7 @@ public class IRBuilder extends ASTVisitor {
                         node.setResult(result);
                         node.setAllocAddr(null);
                         break;
-                    }else if(ltype instanceof StringType && rtype instanceof StringType){
+                    } else if (ltype instanceof StringType && rtype instanceof StringType) {
                         LLVMfunction mfunction = module.getBuiltInFunctionMap().get("__string_notEqual");
                         //init paras
                         ArrayList<Operand> paras = new ArrayList<Operand>();
@@ -1140,10 +1190,10 @@ public class IRBuilder extends ASTVisitor {
                         node.setResult(result);
                         node.setAllocAddr(null);
                         break;
-                    }else if((ltype instanceof ArrayType && rtype instanceof NullType)
+                    } else if ((ltype instanceof ArrayType && rtype instanceof NullType)
                             || (ltype instanceof NullType && rtype instanceof ArrayType)
                             || (ltype instanceof ClassType && rtype instanceof NullType)
-                            || (ltype instanceof NullType && rtype instanceof ClassType)){
+                            || (ltype instanceof NullType && rtype instanceof ClassType)) {
                         Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int1), "notEqualResult");
                         currentFunction.registerVar(result.getName(), result);
                         LLVMtype compareType = rtype instanceof NullType ? lhsResult.getLlvMtype() : rhsResult.getLlvMtype();
@@ -1153,18 +1203,19 @@ public class IRBuilder extends ASTVisitor {
                         node.setResult(result);
                         node.setAllocAddr(null);
                         break;
-                    }else if(ltype instanceof NullType && rtype instanceof  NullType){
+                    } else if (ltype instanceof NullType && rtype instanceof NullType) {
                         node.setResult(new ConstBool(false));
                         node.setLvalue(null);
                         break;
                     }
                 }
-                default:assert false;
+                default:
+                    assert false;
             }
 
-        }else{
-            switch (op){
-                case "&&":{
+        } else {
+            switch (op) {
+                case "&&": {
                     ExprNode lhs = node.getLhs();
                     ExprNode rhs = node.getRhs();
                     Block branchBlock = new Block("logicalAndBranch", currentFunction);
@@ -1189,7 +1240,7 @@ public class IRBuilder extends ASTVisitor {
                     currentBlock = mergeBlock;
                     Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int1), "logicAnd");
                     currentFunction.registerVar(result.getName(), result);
-                    Set<Pair<Operand, Block>>branches = new LinkedHashSet<>();  //gugu changde: container can be modified
+                    Set<Pair<Operand, Block>> branches = new LinkedHashSet<>();  //gugu changde: container can be modified
                     branches.add(new Pair<>(new ConstBool(false), originalBlock));
                     branches.add(new Pair<>(rhsResult, branchBlock));
                     currentBlock.addInst(new PhiInst(currentBlock, branches, result));
@@ -1199,7 +1250,7 @@ public class IRBuilder extends ASTVisitor {
                     node.setAllocAddr(null);
                     break;
                 }
-                case "||":{
+                case "||": {
                     ExprNode lhs = node.getLhs();
                     ExprNode rhs = node.getRhs();
                     Block branchBlock = new Block("logicalOrBranch", currentFunction);
@@ -1224,7 +1275,7 @@ public class IRBuilder extends ASTVisitor {
                     currentBlock = mergeBlock;
                     Register result = new Register(new LLVMIntType(LLVMIntType.BitWidth.int1), "logicOr");
                     currentFunction.registerVar(result.getName(), result);
-                    Set<Pair<Operand, Block>>branches = new LinkedHashSet<>();  //gugu changde: container can be modified
+                    Set<Pair<Operand, Block>> branches = new LinkedHashSet<>();  //gugu changde: container can be modified
                     branches.add(new Pair<>(new ConstBool(true), originalBlock));
                     branches.add(new Pair<>(rhsResult, branchBlock));
                     currentBlock.addInst(new PhiInst(currentBlock, branches, result));
@@ -1234,7 +1285,8 @@ public class IRBuilder extends ASTVisitor {
                     node.setAllocAddr(null);
                     break;
                 }
-                default:assert false;
+                default:
+                    assert false;
             }
         }
     }

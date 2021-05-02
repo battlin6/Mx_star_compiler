@@ -3,7 +3,7 @@ package IR.LLVMoperand;
 import IR.TypeSystem.LLVMIntType;
 import IR.TypeSystem.LLVMtype;
 
-public class ConstBool extends Operand implements Constant{
+public class ConstBool extends Operand implements Constant {
     private boolean value;
 
     public ConstBool(boolean value) {

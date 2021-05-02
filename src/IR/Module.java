@@ -30,11 +30,11 @@ public class Module {
         DefineGlobals = new ArrayList<DefineGlobal>();
     }
 
-    public void initTypeMethod(TypeTable typeTable){
-        for(Type astType : typeTable.getTypetable().values()){
-            if(astType instanceof ClassType){
+    public void initTypeMethod(TypeTable typeTable) {
+        for (Type astType : typeTable.getTypetable().values()) {
+            if (astType instanceof ClassType) {
                 HashMap<String, Function> methods = ((ClassType) astType).getMethods();
-                for(HashMap.Entry<String, Function> method : methods.entrySet()){
+                for (HashMap.Entry<String, Function> method : methods.entrySet()) {
                     initMethod(((ClassType) astType).getName() + "$" + method.getKey(),
                             method.getValue(), (ClassType) astType, false);
                 }
@@ -43,13 +43,13 @@ public class Module {
     }
 
     public void initTypeConstructor(TypeTable typeTable) {
-        try{
-            for(Type astType : typeTable.getTypetable().values()){
-                if(astType instanceof ClassType){
+        try {
+            for (Type astType : typeTable.getTypetable().values()) {
+                if (astType instanceof ClassType) {
                     Function constructor = astType.getConstructor();
-                    if(constructor.getCategory() != Function.Category.defaultConstructor)
+                    if (constructor.getCategory() != Function.Category.defaultConstructor)
                         initMethod(((ClassType) astType).getName() + "$" + ((ClassType) astType).getName(),
-                            constructor, (ClassType) astType, true);
+                                constructor, (ClassType) astType, true);
                 }
             }
         } catch (CompileError compileError) {
@@ -57,32 +57,31 @@ public class Module {
         }
     }
 
-    public void initTypeMap(TypeTable typeTable){
-        for(Type astType : typeTable.getTypetable().values()){
-            if(astType instanceof IntType)
+    public void initTypeMap(TypeTable typeTable) {
+        for (Type astType : typeTable.getTypetable().values()) {
+            if (astType instanceof IntType)
                 typeMap.put(astType, new LLVMIntType(LLVMIntType.BitWidth.int32));
-            else if(astType instanceof BoolType)
+            else if (astType instanceof BoolType)
                 typeMap.put(astType, new LLVMIntType(LLVMIntType.BitWidth.int1));
-            else if(astType instanceof VoidType){
+            else if (astType instanceof VoidType) {
                 typeMap.put(astType, new LLVMVoidType());
-            }
-            else if(astType instanceof NullType)        //maybe deleted
+            } else if (astType instanceof NullType)        //maybe deleted
                 typeMap.put(astType, new LLVMNullType());
-            else if(astType instanceof StringType)
+            else if (astType instanceof StringType)
                 typeMap.put(astType, new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)));
-            else{
+            else {
                 assert astType instanceof ClassType;
                 typeMap.put(astType, new LLVMStructType(((ClassType) astType).getName(),
                         new ArrayList<LLVMtype>(), new HashMap<String, Integer>()));
             }
         }
         // init member
-        for(Type astType : typeTable.getTypetable().values()){
-            if(astType instanceof ClassType){
+        for (Type astType : typeTable.getTypetable().values()) {
+            if (astType instanceof ClassType) {
                 LLVMStructType llvmStructType = (LLVMStructType) typeMap.get(astType);
                 int index = 0;
                 HashMap<String, Type> varMembers = ((ClassType) astType).getVarMembers();
-                for(String memberName : varMembers.keySet()){
+                for (String memberName : varMembers.keySet()) {
                     Type memberType = varMembers.get(memberName);
                     LLVMtype LLVMMemberType = memberType.convert2LLVM(typeMap);
                     llvmStructType.getMembers().add(LLVMMemberType);
@@ -96,9 +95,9 @@ public class Module {
 
     }
 
-    public void initNormalFunction(String functionName, Function function){
+    public void initNormalFunction(String functionName, Function function) {
         ArrayList<Register> paras = new ArrayList<Register>();
-        for(VariableEntity para : function.getParas()){
+        for (VariableEntity para : function.getParas()) {
             LLVMtype llvmParaType = para.getType().convert2LLVM(typeMap);
             paras.add(new Register(llvmParaType, para.getId()));
         }
@@ -112,7 +111,7 @@ public class Module {
         llvMfunction.setReturnBlock(returnBlock);
 //        llvMfunction.registerBlock(initBlock.getName(), initBlock);
 //        llvMfunction.registerBlock(returnBlock.getName(), returnBlock);
-        if(!(llvmReturnType instanceof LLVMVoidType)){
+        if (!(llvmReturnType instanceof LLVMVoidType)) {
             Register returnAddr = new Register(new LLVMPointerType(llvmReturnType), "return$address");
             llvMfunction.setReturnAddr(returnAddr);
             llvMfunction.registerVar(returnAddr.getName(), returnAddr);
@@ -123,10 +122,10 @@ public class Module {
             llvMfunction.registerVar(returnLoad.getName(), returnLoad);
             returnBlock.addInst(new LoadInst(returnBlock, returnAddr, returnLoad));
             returnBlock.addInst(new ReturnInst(returnBlock, llvmReturnType, returnLoad));
-        }else{
+        } else {
             returnBlock.addInst(new ReturnInst(returnBlock, new LLVMVoidType(), null));
         }
-        for(int i = 0; i < paras.size(); i++){
+        for (int i = 0; i < paras.size(); i++) {
             Register para = paras.get(i);
             para.setParameter(true);            //gugu changed:
             LLVMtype paraAddrType = para.getLlvMtype();
@@ -140,17 +139,17 @@ public class Module {
     }
 
     //can used for both method and constructor
-    public void initMethod(String functionName, Function function, ClassType classType, boolean inConstructor){
+    public void initMethod(String functionName, Function function, ClassType classType, boolean inConstructor) {
         ArrayList<Register> paras = new ArrayList<Register>();
         Register thisRegiser = new Register(classType.convert2LLVM(typeMap), "this");
         thisRegiser.setParameter(true);             //gugu changed
         paras.add(thisRegiser);                             //differ from normal function
-        for(VariableEntity para : function.getParas()){
+        for (VariableEntity para : function.getParas()) {
             LLVMtype llvmParaType = para.getType().convert2LLVM(typeMap);
             paras.add(new Register(llvmParaType, para.getId()));
         }
         LLVMtype llvmReturnType;
-        if(inConstructor)
+        if (inConstructor)
             llvmReturnType = new LLVMVoidType();
         else
             llvmReturnType = function.getReturnType().convert2LLVM(typeMap);
@@ -164,7 +163,7 @@ public class Module {
         llvMfunction.setReturnBlock(returnBlock);
 //        llvMfunction.registerBlock(initBlock.getName(), initBlock);
 //        llvMfunction.registerBlock(returnBlock.getName(), returnBlock);
-        if(!(llvmReturnType instanceof LLVMVoidType)){
+        if (!(llvmReturnType instanceof LLVMVoidType)) {
             Register returnAddr = new Register(new LLVMPointerType(llvmReturnType), "return$address");
             llvMfunction.setReturnAddr(returnAddr);
             llvMfunction.registerVar(returnAddr.getName(), returnAddr);
@@ -175,7 +174,7 @@ public class Module {
             llvMfunction.registerVar(returnLoad.getName(), returnLoad);
             returnBlock.addInst(new LoadInst(returnBlock, returnAddr, returnLoad));
             returnBlock.addInst(new ReturnInst(returnBlock, llvmReturnType, returnLoad));
-        }else{
+        } else {
             returnBlock.addInst(new ReturnInst(returnBlock, new LLVMVoidType(), null));
         }
         //differ from normal function
@@ -184,7 +183,7 @@ public class Module {
         llvMfunction.registerVar(thisAddr.getName(), thisAddr);
         initBlock.addInst(new AllocInst(initBlock, thisAddr, thisRegiser.getLlvMtype()));
         initBlock.addInst(new StoreInst(initBlock, thisRegiser, thisAddr));
-        for(int i = 1; i < paras.size(); i++){
+        for (int i = 1; i < paras.size(); i++) {
             Register para = paras.get(i);                                 //differ from normal funtion
             para.setParameter(true);                //gugu changed
             LLVMtype paraAddrType = para.getLlvMtype();
@@ -193,11 +192,11 @@ public class Module {
             llvMfunction.registerVar(allocAddr.getName(), allocAddr);
             initBlock.addInst(new AllocInst(initBlock, allocAddr, paraAddrType));
             initBlock.addInst(new StoreInst(initBlock, para, allocAddr));
-            function.getParas().get(i-1).setAllocAddr(allocAddr);           //
+            function.getParas().get(i - 1).setAllocAddr(allocAddr);           //
         }
     }
 
-    public void initBuiltInFunction(TypeTable typeTable){
+    public void initBuiltInFunction(TypeTable typeTable) {
         // Add external functions.
         LLVMtype returnType;
         ArrayList<Register> parameters;
@@ -277,8 +276,8 @@ public class Module {
         // string string.concatenate(string str1, string str2);
         returnType = new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8));
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str1"));
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str2"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str1"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str2"));
         function = new LLVMfunction("__string_concatenate", parameters, returnType);
         this.builtInFunctionMap.put(function.getFunctionName(), function);
         function.setSideEffect(false);
@@ -287,8 +286,8 @@ public class Module {
         // bool string.equal(string str1, string str2);
         returnType = new LLVMIntType(LLVMIntType.BitWidth.int1);
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str1"));
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str2"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str1"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str2"));
         function = new LLVMfunction("__string_equal", parameters, returnType);
         this.builtInFunctionMap.put(function.getFunctionName(), function);
         function.setSideEffect(false);
@@ -297,8 +296,8 @@ public class Module {
         // bool string.notEqual(string str1, string str2);
         returnType = new LLVMIntType(LLVMIntType.BitWidth.int1);
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str1"));
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str2"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str1"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str2"));
         function = new LLVMfunction("__string_notEqual", parameters, returnType);
         this.builtInFunctionMap.put(function.getFunctionName(), function);
         function.setSideEffect(false);
@@ -307,8 +306,8 @@ public class Module {
         // bool string.lessThan(string str1, string str2);
         returnType = new LLVMIntType(LLVMIntType.BitWidth.int1);
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str1"));
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str2"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str1"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str2"));
         function = new LLVMfunction("__string_lessThan", parameters, returnType);
         this.builtInFunctionMap.put(function.getFunctionName(), function);
         function.setSideEffect(false);
@@ -317,8 +316,8 @@ public class Module {
         // bool string.greaterThan(string str1, string str2);
         returnType = new LLVMIntType(LLVMIntType.BitWidth.int1);
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str1"));
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str2"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str1"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str2"));
         function = new LLVMfunction("__string_greaterThan", parameters, returnType);
         this.builtInFunctionMap.put(function.getFunctionName(), function);
         function.setSideEffect(false);
@@ -327,8 +326,8 @@ public class Module {
         // bool string.lessEqual(string str1, string str2);
         returnType = new LLVMIntType(LLVMIntType.BitWidth.int1);
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str1"));
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str2"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str1"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str2"));
         function = new LLVMfunction("__string_lessEqual", parameters, returnType);
         this.builtInFunctionMap.put(function.getFunctionName(), function);
         function.setSideEffect(false);
@@ -337,8 +336,8 @@ public class Module {
         // bool string.greaterEqual(string str1, string str2);
         returnType = new LLVMIntType(LLVMIntType.BitWidth.int1);
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str1"));
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str2"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str1"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str2"));
         function = new LLVMfunction("__string_greaterEqual", parameters, returnType);
         this.builtInFunctionMap.put(function.getFunctionName(), function);
         function.setSideEffect(false);
@@ -348,7 +347,7 @@ public class Module {
         // int string.length(string str);
         returnType = new LLVMIntType(LLVMIntType.BitWidth.int32);
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str"));
         function = new LLVMfunction("__string_length", parameters, returnType);
         this.builtInFunctionMap.put(function.getFunctionName(), function);
         function.setSideEffect(false);
@@ -357,7 +356,7 @@ public class Module {
         // string string.substring(string str, int left, int right);
         returnType = new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8));
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str"));
         parameters.add(new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "left"));
         parameters.add(new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "right"));
         function = new LLVMfunction("__string_substring", parameters, returnType);
@@ -368,7 +367,7 @@ public class Module {
         // int string.parseInt(string str);
         returnType = new LLVMIntType(LLVMIntType.BitWidth.int32);
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str"));
         function = new LLVMfunction("__string_parseInt", parameters, returnType);
         this.builtInFunctionMap.put(function.getFunctionName(), function);
         function.setSideEffect(false);
@@ -377,7 +376,7 @@ public class Module {
         // int ord(string str, int pos);
         returnType = new LLVMIntType(LLVMIntType.BitWidth.int32);
         parameters = new ArrayList<Register>();
-        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)),"str"));
+        parameters.add(new Register(new LLVMPointerType(new LLVMIntType(LLVMIntType.BitWidth.int8)), "str"));
         parameters.add(new Register(new LLVMIntType(LLVMIntType.BitWidth.int32), "pos"));
         function = new LLVMfunction("__string_ord", parameters, returnType);
         this.builtInFunctionMap.put(function.getFunctionName(), function);
@@ -424,7 +423,7 @@ public class Module {
         visitor.visit(this);
     }
 
-    public boolean checkNormalFunctional(){
+    public boolean checkNormalFunctional() {
         for (LLVMfunction function : functionMap.values()) {
             if (!function.isFunctional())
                 return false;
@@ -432,9 +431,9 @@ public class Module {
         return true;
     }
 
-    public boolean checkTrivalCall(){
+    public boolean checkTrivalCall() {
         int trivalCount = 0;
-        for (LLVMfunction function : functionMap.values()){
+        for (LLVMfunction function : functionMap.values()) {
             for (Block block : function.getBlocks()) {
                 LLVMInstruction currentInst = block.getInstHead();
                 while (currentInst != null) {
@@ -442,9 +441,9 @@ public class Module {
                         CallInst callInst = (CallInst) currentInst;
                         LLVMfunction callee = callInst.getLlvMfunction();
 //                        if(callee == builtInFunctionMap.get("toString")){
-                            trivalCount++;
-                            if(trivalCount > 300)
-                                return false;
+                        trivalCount++;
+                        if (trivalCount > 300)
+                            return false;
 //                        }
                     }
                     currentInst = currentInst.getPostInst();

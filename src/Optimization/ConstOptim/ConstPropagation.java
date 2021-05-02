@@ -200,7 +200,7 @@ public class ConstPropagation extends IRPass implements IRVisitor {
     public OpStatus getNowStatus(Operand operand) {
         if (operandStatusMap.containsKey(operand))
             return operandStatusMap.get(operand);
-        else{
+        else {
             OpStatus naiveStatus;
             if (operand instanceof Constant)
                 naiveStatus = new OpStatus(OpStatus.Status.constant, operand);
@@ -230,7 +230,6 @@ public class ConstPropagation extends IRPass implements IRVisitor {
     public void visit(ReturnInst inst) {
 
     }
-
 
 
     @Override
@@ -275,7 +274,7 @@ public class ConstPropagation extends IRPass implements IRVisitor {
 
     }
 
-    private Constant foldIcmpConstant(LLVMInstruction inst, Constant lhsConstant, Constant rhsConstant){
+    private Constant foldIcmpConstant(LLVMInstruction inst, Constant lhsConstant, Constant rhsConstant) {
         Operand lhs = (Operand) lhsConstant;
         Operand rhs = (Operand) rhsConstant;
         assert inst instanceof BinaryOpInst || inst instanceof IcmpInst;

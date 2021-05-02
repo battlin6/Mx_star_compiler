@@ -64,14 +64,15 @@ public class LLVMStructType extends LLVMtype {
         return size;
     }
 
-    private int align(int size, int base){
-        if(base == 0)
+    private int align(int size, int base) {
+        if (base == 0)
             return 0;
-        if(size % base == 0)
+        if (size % base == 0)
             return size;
         else
             return size + (base - (size % base));
     }
+
     public String printInnerStructure() {
         StringBuilder string = new StringBuilder(this.toString());
         string.append(" = type { ");

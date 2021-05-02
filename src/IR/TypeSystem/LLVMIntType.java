@@ -4,10 +4,11 @@ import IR.LLVMoperand.ConstBool;
 import IR.LLVMoperand.ConstInt;
 import IR.LLVMoperand.Operand;
 
-public class LLVMIntType extends LLVMtype{
-    public enum BitWidth{
+public class LLVMIntType extends LLVMtype {
+    public enum BitWidth {
         int1, int8, int32
     }
+
     private BitWidth bitWidth;
 
     public LLVMIntType(BitWidth bitWidth) {
@@ -16,7 +17,7 @@ public class LLVMIntType extends LLVMtype{
 
     @Override
     public String toString() {
-        switch (bitWidth){
+        switch (bitWidth) {
             case int1:
                 return "i1";
             case int8:
@@ -28,7 +29,7 @@ public class LLVMIntType extends LLVMtype{
 
     @Override
     public int getByte() {
-        if(bitWidth == BitWidth.int32)
+        if (bitWidth == BitWidth.int32)
             return 4;
         else
             return 1;
@@ -36,7 +37,7 @@ public class LLVMIntType extends LLVMtype{
 
     @Override
     public Operand DefaultValue() {
-        if(bitWidth == BitWidth.int1)
+        if (bitWidth == BitWidth.int1)
             return new ConstBool(false);
         else
             return new ConstInt(new LLVMIntType(BitWidth.int1), 0);

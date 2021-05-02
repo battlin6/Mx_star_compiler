@@ -14,7 +14,7 @@ import java.util.Queue;
 import java.util.Set;
 
 
-public class BranchInst extends LLVMInstruction{
+public class BranchInst extends LLVMInstruction {
     private Operand condition;
     private Block ifTrueBlock;
     private Block ifFalseBlock;
@@ -28,7 +28,7 @@ public class BranchInst extends LLVMInstruction{
 
     @Override
     public String toString() {
-        if(condition == null)
+        if (condition == null)
             return "br label " + ifTrueBlock.toString();
         else
             return "br i1 " + condition.toString() + ", label " + ifTrueBlock.toString() + ", label " + ifFalseBlock.toString();
@@ -54,10 +54,10 @@ public class BranchInst extends LLVMInstruction{
         throw new RuntimeException("Error :Get result of branch instruction.");
     }
 
-    public void reset2Unconditional(Block block){
+    public void reset2Unconditional(Block block) {
         //delete original link
         Block selfBlock = this.getBlock();
-        if(condition != null){
+        if (condition != null) {
             this.condition.removeUse(this);
             this.ifFalseBlock.removeUse(this);
             selfBlock.cutSuccessor(this.ifFalseBlock);
@@ -76,7 +76,7 @@ public class BranchInst extends LLVMInstruction{
     @Override
     public void removeFromBlock() {
         super.removeFromBlock();
-        if(condition != null){
+        if (condition != null) {
             condition.removeUse(this);
             ifFalseBlock.removeUse(this);
         }
@@ -85,17 +85,17 @@ public class BranchInst extends LLVMInstruction{
 
     @Override
     public void overrideObject(Object oldUse, Object newUse) {
-        if(condition == oldUse){
+        if (condition == oldUse) {
             condition.removeUse(this);
             condition = (Operand) newUse;
             condition.addUse(this);
         }           //gugu changed the block/operand/function use override can be separate
-        if(ifTrueBlock == oldUse){
+        if (ifTrueBlock == oldUse) {
             ifTrueBlock.removeUse(this);
             ifTrueBlock = (Block) newUse;
             ifTrueBlock.addUse(this);
         }
-        if(ifFalseBlock == oldUse){
+        if (ifFalseBlock == oldUse) {
             ifFalseBlock.removeUse(this);
             ifFalseBlock = (Block) newUse;
             ifFalseBlock.addUse(this);
@@ -131,7 +131,6 @@ public class BranchInst extends LLVMInstruction{
         if (condition != null)
             condition.markBaseAsLive(live, queue);
     }
-
 
 
     @Override

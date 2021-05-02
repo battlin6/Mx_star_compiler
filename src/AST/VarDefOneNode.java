@@ -1,7 +1,9 @@
 package AST;
 
 import AST.Location.Location;
-import AST.NodeProperties.*;
+import AST.NodeProperties.ASTNode;
+import AST.NodeProperties.ExprNode;
+import AST.NodeProperties.TypeNode;
 import AST.VariableEntity.VariableEntity;
 import AST.Visit.ASTVisitor;
 import Semantic.ExceptionHandle.CompileError;
@@ -14,7 +16,7 @@ public class VarDefOneNode extends ASTNode {
 
     private VariableEntity variableEntity;
 
-    public VarDefOneNode(String text, Location location, String id, ExprNode initValue){    //without initial type
+    public VarDefOneNode(String text, Location location, String id, ExprNode initValue) {    //without initial type
         super(text, location);
         this.id = id;
         this.initValue = initValue;

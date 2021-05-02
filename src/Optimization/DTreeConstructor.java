@@ -20,7 +20,7 @@ public class DTreeConstructor extends IRPass {
 
     @Override
     public boolean run() {
-        if(!module.checkNormalFunctional()) return false;
+        if (!module.checkNormalFunctional()) return false;
         for (LLVMfunction function : module.getFunctionMap().values()) {
             constructDTree(function);
             constructDFrontier(function);

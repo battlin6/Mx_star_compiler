@@ -1,10 +1,10 @@
 package BackEnd.Construct;
 
 import BackEnd.ASMBlock;
+import BackEnd.ASMFunction;
 import BackEnd.ASMModule;
 import BackEnd.Instruction.ASMInstruction;
 import BackEnd.Operand.ASMRegister.VirtualASMRegister;
-import BackEnd.ASMFunction;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,7 +23,7 @@ public class LivenessAnalysis extends ASMPass {
 
     private void computeLiveOutSet(ASMFunction ASMFunction) {
         ArrayList<ASMBlock> dfsOrder = ASMFunction.getDFSOrder();
-        for (ASMBlock block : dfsOrder){
+        for (ASMBlock block : dfsOrder) {
             Set<VirtualASMRegister> UEVar = new HashSet<>();
             Set<VirtualASMRegister> varKill = new HashSet<>();
 
@@ -37,7 +37,7 @@ public class LivenessAnalysis extends ASMPass {
             block.setVarKill(varKill);
         }
 
-        for (int i = dfsOrder.size() - 1; i >= 0; i--) {
+        for (int i = dfsOrder.size() - 1; i >= 0; --i) {
             ASMBlock block = dfsOrder.get(i);
             block.setLiveOut(new HashSet<>());
         }
@@ -45,7 +45,7 @@ public class LivenessAnalysis extends ASMPass {
         boolean changed = true;
         while (changed) {
             changed = false;
-            for (int i = dfsOrder.size() - 1; i >= 0; i--) {
+            for (int i = dfsOrder.size() - 1; i >= 0; --i) {
                 ASMBlock block = dfsOrder.get(i);
                 Set<VirtualASMRegister> liveOut = new HashSet<>();
                 for (ASMBlock successor : block.getSuccessors()) {
@@ -64,7 +64,6 @@ public class LivenessAnalysis extends ASMPass {
             }
         }
     }
-
 
 
 }

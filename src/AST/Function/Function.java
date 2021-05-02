@@ -8,21 +8,23 @@ import java.util.ArrayList;
 
 public class Function {
 
-    public enum Category{
+    public enum Category {
         Normal, Method, BuiltIn, Constructor, defaultConstructor
     }
+
     private Type returnType;
     private ArrayList<VariableEntity> paras;
     private BlockNode funcBody;    //null when the function is in_built | default constructor | arraySize function |
     private Category category;
-    public Function(Type returnType, ArrayList<VariableEntity> paras, BlockNode funcBody, Category category){
+
+    public Function(Type returnType, ArrayList<VariableEntity> paras, BlockNode funcBody, Category category) {
         this.returnType = returnType;
         this.paras = paras;
         this.funcBody = funcBody;
         this.category = category;
     }
 
-    public void addPara(VariableEntity variableEntity){
+    public void addPara(VariableEntity variableEntity) {
         paras.add(variableEntity);
     }
 

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-public class IcmpInst extends LLVMInstruction{
+public class IcmpInst extends LLVMInstruction {
     public enum IcmpName {
         eq, ne, sgt, sge, slt, sle
     }
@@ -49,12 +49,12 @@ public class IcmpInst extends LLVMInstruction{
 
     @Override
     public void overrideObject(Object oldUse, Object newUse) {
-        if(op1 == oldUse){
+        if (op1 == oldUse) {
             op1.removeUse(this);
             op1 = (Operand) newUse;
             op1.addUse(this);
         }
-        if(op2 == oldUse){
+        if (op2 == oldUse) {
             op2.removeUse(this);
             op2 = (Operand) newUse;
             op2.addUse(this);
@@ -117,8 +117,8 @@ public class IcmpInst extends LLVMInstruction{
     }
 
 
-    public void swapOpIfNeed(){
-        if(op1 instanceof Constant){
+    public void swapOpIfNeed() {
+        if (op1 instanceof Constant) {
             switch (operator) {
                 case eq:
                     //do nothing

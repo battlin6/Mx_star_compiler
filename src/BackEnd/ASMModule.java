@@ -20,16 +20,17 @@ public class ASMModule {
         return functionMap;
     }
 
-    public ASMFunction getFunction(String funcName){
+    public ASMFunction getFunction(String funcName) {
         ASMFunction callee;
         if (functionMap.containsKey(funcName))
             callee = functionMap.get(funcName);
-        else{
+        else {
             assert builtInFunctionMap.containsKey(funcName);
             callee = builtInFunctionMap.get(funcName);
         }
         return callee;
     }
+
     public Map<String, ASMFunction> getBuiltInFunctionMap() {
         return builtInFunctionMap;
     }

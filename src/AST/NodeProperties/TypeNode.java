@@ -3,8 +3,8 @@ package AST.NodeProperties;
 import AST.Location.Location;
 import Semantic.ASTtype.Type;
 
-abstract public class TypeNode extends ASTNode{
-     Type type;
+abstract public class TypeNode extends ASTNode {
+    Type type;
 
     public TypeNode(String text, Location location) {
         super(text, location);

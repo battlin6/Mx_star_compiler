@@ -5,9 +5,9 @@ import IR.LLVMoperand.ConstNull;
 import IR.LLVMoperand.Operand;
 import IR.TypeSystem.LLVMPointerType;
 import IR.TypeSystem.LLVMtype;
-import Semantic.ExceptionHandle.CompileError;
 import Semantic.ASTtype.NonArray.NonArrayType;
 import Semantic.ASTtype.NonArray.NullType;
+import Semantic.ExceptionHandle.CompileError;
 
 import java.util.HashMap;
 
@@ -34,29 +34,29 @@ public class ArrayType implements Type {
     @Override
     public LLVMtype convert2LLVM(HashMap<Type, LLVMtype> typeMap) {
         LLVMtype llvMtype = baseNonArrayType.convert2LLVM(typeMap);
-        for(int i= 0; i < dim; i++){
+        for (int i = 0; i < dim; i++) {
             llvMtype = new LLVMPointerType(llvMtype);
         }
         return llvMtype;
     }
 
-    public int getDim(){
+    public int getDim() {
         return this.dim;
     }
 
     @Override
     public boolean equal(Type other) {
-        if(other instanceof ArrayType){
+        if (other instanceof ArrayType) {
             return ((ArrayType) other).baseNonArrayType.equal(this.baseNonArrayType) &&
                     ((ArrayType) other).getDim() == this.dim;
-        }else{
+        } else {
             return false;
         }
     }
 
     @Override
     public boolean assignable(Type other) {
-        if(other instanceof NullType)
+        if (other instanceof NullType)
             return true;
         return equal(other);
     }
@@ -82,7 +82,7 @@ public class ArrayType implements Type {
 
     @Override
     public Function getMethod(String methodName) throws CompileError {
-        if(!hasMethod(methodName))
+        if (!hasMethod(methodName))
             throw new CompileError(null, "ArrayType has only size method");
         return sizeFunction;
     }

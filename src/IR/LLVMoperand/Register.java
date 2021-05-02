@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Queue;
 import java.util.Set;
 
-public class Register extends Operand implements Cloneable{
+public class Register extends Operand implements Cloneable {
     private String name;
     private LLVMInstruction def;
     private boolean isParameter;
@@ -75,7 +75,7 @@ public class Register extends Operand implements Cloneable{
 
     @Override
     public void markBaseAsLive(Set<LLVMInstruction> live, Queue<LLVMInstruction> queue) {
-        if(isParameter())
+        if (isParameter())
             return;
         assert def != null;
         if (!live.contains(def)) {
@@ -89,7 +89,7 @@ public class Register extends Operand implements Cloneable{
         }
     }
 
-    public Register makeCopy(){
+    public Register makeCopy() {
         Register newRegister = new Register(this.getLlvMtype(), this.name, this.def, this.isParameter);
         newRegister.setUse(new LinkedHashMap<>());
         return newRegister;

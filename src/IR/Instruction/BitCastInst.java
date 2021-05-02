@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-public class BitCastInst extends LLVMInstruction{
+public class BitCastInst extends LLVMInstruction {
     private Operand source;
     private LLVMtype objectType;
     private Register result;
@@ -41,7 +41,7 @@ public class BitCastInst extends LLVMInstruction{
 
     @Override
     public void overrideObject(Object oldUse, Object newUse) {
-        if(source == oldUse){
+        if (source == oldUse) {
             source.removeUse(this);
             source = (Operand) newUse;
             source.addUse(this);
@@ -110,8 +110,6 @@ public class BitCastInst extends LLVMInstruction{
     public void markUseAsLive(Set<LLVMInstruction> live, Queue<LLVMInstruction> queue) {
         source.markBaseAsLive(live, queue);
     }
-
-
 
 
     @Override

@@ -1,7 +1,7 @@
 package AST;
 
 import AST.Location.Location;
-import AST.NodeProperties.*;
+import AST.NodeProperties.TypeNode;
 import AST.Visit.ASTVisitor;
 import Semantic.ExceptionHandle.CompileError;
 
@@ -15,11 +15,11 @@ public class ArrayTypeNode extends TypeNode {
         this.baseType = baseType;
     }
 
-    public NonArrayTypeNode getBaseType(){
+    public NonArrayTypeNode getBaseType() {
         return this.baseType;
     }
 
-    public int getDim(){
+    public int getDim() {
         return this.dim;
     }
 

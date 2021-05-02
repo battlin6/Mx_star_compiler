@@ -25,7 +25,7 @@ public class ConstructDefNode extends ASTNode {
         visitor.visit(this);
     }
 
-    public String getClassName(){
+    public String getClassName() {
         return this.className;
     }
 

@@ -4,9 +4,9 @@ import IR.TypeSystem.LLVMPointerType;
 import IR.TypeSystem.LLVMVoidType;
 import IR.TypeSystem.LLVMtype;
 
-public class ConstNull extends Operand implements Constant{
+public class ConstNull extends Operand implements Constant {
     public ConstNull() {
-        super( new LLVMPointerType(new LLVMVoidType()));
+        super(new LLVMPointerType(new LLVMVoidType()));
     }
 
     @Override

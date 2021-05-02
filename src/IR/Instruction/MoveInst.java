@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-public class MoveInst extends LLVMInstruction{
+public class MoveInst extends LLVMInstruction {
     private Operand source;
     private Register result;
 
@@ -40,7 +40,7 @@ public class MoveInst extends LLVMInstruction{
 
     @Override
     public void overrideObject(Object oldUse, Object newUse) {
-        if(source == oldUse){
+        if (source == oldUse) {
             source.removeUse(this);
             source = (Operand) newUse;
             source.addUse(this);

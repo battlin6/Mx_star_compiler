@@ -15,7 +15,8 @@ public class IRPrinter implements IRVisitor {
 
     public IRPrinter(String filename) throws FileNotFoundException {
         stdout = System.out;
-        newout = new PrintStream(filename);;
+        newout = new PrintStream(filename);
+        ;
         indent = "    ";
     }
 
@@ -33,24 +34,24 @@ public class IRPrinter implements IRVisitor {
     public void visit(Module module) throws IOException {
         System.setOut(newout);
         //struct
-        for(LLVMtype llvMtype : module.getTypeMap().values()){
-            if(llvMtype instanceof LLVMStructType)
+        for (LLVMtype llvMtype : module.getTypeMap().values()) {
+            if (llvMtype instanceof LLVMStructType)
                 println(((LLVMStructType) llvMtype).printInnerStructure());
         }
         println("");
         //global variable
-        for(DefineGlobal defineGlobal : module.getDefineGlobals()){
+        for (DefineGlobal defineGlobal : module.getDefineGlobals()) {
             println(defineGlobal.toString());
         }
         println("");
         //builtIn function
-        for(LLVMfunction llvMfunction : module.getBuiltInFunctionMap().values()){
+        for (LLVMfunction llvMfunction : module.getBuiltInFunctionMap().values()) {
             println(llvMfunction.printDeclaratiion());
             //System.out.println(llvMfunction.printDeclaratiion());
         }
         println("");
         //function
-        for(LLVMfunction llvMfunction : module.getFunctionMap().values()){
+        for (LLVMfunction llvMfunction : module.getFunctionMap().values()) {
             llvMfunction.accept(this);
             println("");
         }
@@ -59,15 +60,14 @@ public class IRPrinter implements IRVisitor {
     }
 
 
-
     @Override
     public void visit(LLVMfunction function) {
         println(function.printDeclaratiion().replace("declare", "define") + " {");
 
         Block nowBlock = function.getInitBlock();
-        while (nowBlock != null){
+        while (nowBlock != null) {
             nowBlock.accept(this);
-            if(nowBlock.getNext() != null)  println("");
+            if (nowBlock.getNext() != null) println("");
             nowBlock = nowBlock.getNext();
         }
 
@@ -77,7 +77,7 @@ public class IRPrinter implements IRVisitor {
     @Override
     public void visit(Block block) {            //gugu changde: can be changed a lot
         print(block.getName() + ":");
-        if(block.hasPredecessor()){
+        if (block.hasPredecessor()) {
             print(" ".repeat(50 - (block.getName().length() + 1)));
             print("; preds = ");
             int size = block.getPredecessors().size();
@@ -91,7 +91,7 @@ public class IRPrinter implements IRVisitor {
         println("");
 
         LLVMInstruction nowInstruction = block.getInstHead();
-        while(nowInstruction != null){
+        while (nowInstruction != null) {
             nowInstruction.accept(this);
             nowInstruction = nowInstruction.getPostInst();
         }

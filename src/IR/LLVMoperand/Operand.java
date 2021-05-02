@@ -16,31 +16,31 @@ abstract public class Operand {
         this.use = new LinkedHashMap<>();   //why linkedHashMap ? gugu changed
     }
 
-    public void addUse(LLVMInstruction instruction){
-        if(!use.containsKey(instruction)){
-            use.put(instruction,1);
-        }else{
+    public void addUse(LLVMInstruction instruction) {
+        if (!use.containsKey(instruction)) {
+            use.put(instruction, 1);
+        } else {
             use.put(instruction, use.get(instruction) + 1);
         }
     }
 
-    public void removeUse(LLVMInstruction instruction){
+    public void removeUse(LLVMInstruction instruction) {
         int cnt = use.get(instruction);
-        if(cnt == 1)
+        if (cnt == 1)
             use.remove(instruction);
         else
-            use.replace(instruction, cnt-1);
+            use.replace(instruction, cnt - 1);
     }
 
-    public void beOverriden(Object newUse){
+    public void beOverriden(Object newUse) {
         ArrayList<LLVMInstruction> instructions = new ArrayList<>(use.keySet());
-        for(LLVMInstruction instruction : instructions){
+        for (LLVMInstruction instruction : instructions) {
             instruction.overrideObject(this, newUse);
         }
         use.clear();
     }
 
-    public String getName(){
+    public String getName() {
         return null;
     }
 
@@ -90,7 +90,7 @@ abstract public class Operand {
             return 2;
     }
 
-    public void markBaseAsLive(Set<LLVMInstruction> live, Queue<LLVMInstruction> queue){
+    public void markBaseAsLive(Set<LLVMInstruction> live, Queue<LLVMInstruction> queue) {
 
     }
 }

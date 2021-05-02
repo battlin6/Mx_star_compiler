@@ -26,7 +26,7 @@ public class CallInst extends LLVMInstruction {
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder();
-        if(result != null){
+        if (result != null) {
             string.append(result.toString() + " = ");
         }
         string.append("call " + llvMfunction.getResultType().toString() + " " + "@" +
@@ -44,7 +44,7 @@ public class CallInst extends LLVMInstruction {
     @Override
     public void removeFromBlock() {
         super.removeFromBlock();
-        for(Operand para : paras){
+        for (Operand para : paras) {
             para.removeUse(this);       //gugu changed: why only delete use, not delete variable def
         }
         llvMfunction.removeUse(this);
@@ -53,15 +53,15 @@ public class CallInst extends LLVMInstruction {
     @Override
     public void overrideObject(Object oldUse, Object newUse) {
         ListIterator<Operand> listIterator = paras.listIterator();
-        while(listIterator.hasNext()){
-            Operand para= listIterator.next();
-            if(para == oldUse){
+        while (listIterator.hasNext()) {
+            Operand para = listIterator.next();
+            if (para == oldUse) {
                 para.removeUse(this);
                 listIterator.set((Operand) newUse);
                 ((Operand) newUse).addUse(this);
             }
         }
-        if(llvMfunction == oldUse){
+        if (llvMfunction == oldUse) {
             llvMfunction.removeUse(this);
             llvMfunction = (LLVMfunction) newUse;
             llvMfunction.addUse(this);
@@ -142,12 +142,12 @@ public class CallInst extends LLVMInstruction {
     @Override
     public LLVMInstruction makeCopy() {
         Register newResult = null;
-        if(this.result != null)
+        if (this.result != null)
             newResult = this.result.makeCopy();
         CallInst callInst = new CallInst(this.getBlock(), newResult,
                 this.llvMfunction, new ArrayList<>(this.paras));
 
-        if(newResult != null)
+        if (newResult != null)
             newResult.setDef(callInst);
         return callInst;
     }

@@ -31,12 +31,12 @@ public class DefineGlobal extends LLVMInstruction {
         StringBuilder string = new StringBuilder(globalVar.toString() + " = ");
         //maybe need modified
         assert globalVar.getLlvMtype() instanceof LLVMPointerType;
-        if(init instanceof ConstString){
+        if (init instanceof ConstString) {
             string.append("private unnamed_addr constant " +
                     ((LLVMPointerType) globalVar.getLlvMtype()).getBaseType().toString() +
                     " " + init.toString());
-        }else{
-            string.append("global " + ((LLVMPointerType) globalVar.getLlvMtype()).getBaseType().toString()+
+        } else {
+            string.append("global " + ((LLVMPointerType) globalVar.getLlvMtype()).getBaseType().toString() +
                     " " + init.toString());
         }
         return string.toString();

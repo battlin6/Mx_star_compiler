@@ -5,7 +5,7 @@ import AST.NodeProperties.ExprNode;
 import AST.Visit.ASTVisitor;
 import Semantic.ExceptionHandle.CompileError;
 
-public class PostfixExprNode extends ExprNode{
+public class PostfixExprNode extends ExprNode {
     private ExprNode expr;
     private String op;  //"++" or "--"
 

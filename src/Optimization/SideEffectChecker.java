@@ -31,7 +31,7 @@ public class SideEffectChecker extends IRPass {
 
     @Override
     public boolean run() {
-        if(!module.checkNormalFunctional()) return false;
+        if (!module.checkNormalFunctional()) return false;
         operandScopeMap = new HashMap<>();
         returnValueScope = new HashMap<>();
 
@@ -65,7 +65,7 @@ public class SideEffectChecker extends IRPass {
         checkRecursive(queue);
     }
 
-    private boolean checkBlockEffect(Block block){
+    private boolean checkBlockEffect(Block block) {
         LLVMInstruction currentInst = block.getInstHead();
         while (currentInst != null) {
             if (currentInst instanceof StoreInst) {
@@ -80,7 +80,7 @@ public class SideEffectChecker extends IRPass {
         return false;
     }
 
-    private void checkRecursive(Queue<LLVMfunction> queue){
+    private void checkRecursive(Queue<LLVMfunction> queue) {
         while (!queue.isEmpty()) {
             LLVMfunction function = queue.poll();
             for (LLVMInstruction callInst : function.getUse().keySet()) {
@@ -95,7 +95,6 @@ public class SideEffectChecker extends IRPass {
     }
 
 
-
     private Map<LLVMfunction, Scope> returnValueScope;
 
     static public Scope getOperandScope(Operand operand) {
@@ -108,7 +107,7 @@ public class SideEffectChecker extends IRPass {
 
     private void roughComputeScope() {
         //globalVar outer
-        for (DefineGlobal defineGlobal : module.getDefineGlobals()){
+        for (DefineGlobal defineGlobal : module.getDefineGlobals()) {
             GlobalVar globalVar = defineGlobal.getGlobalVar();
             operandScopeMap.put(globalVar, Scope.outerVar);
         }
@@ -132,7 +131,7 @@ public class SideEffectChecker extends IRPass {
             }
         }
 
-        for(LLVMfunction mfunction : module.getFunctionMap().values()){
+        for (LLVMfunction mfunction : module.getFunctionMap().values()) {
             if (mfunction.getResultType() instanceof LLVMPointerType)
                 returnValueScope.put(mfunction, Scope.outerVar);
             else
@@ -142,14 +141,12 @@ public class SideEffectChecker extends IRPass {
             returnValueScope.put(function, Scope.localVar);
 
 
-
-
     }
 
-    private void preciseComputeScope(){
+    private void preciseComputeScope() {
         Queue<LLVMfunction> queue = new LinkedList<>();
         Set<LLVMfunction> isInQueue = new HashSet<>();
-        for(LLVMfunction mfunction : module.getFunctionMap().values()){
+        for (LLVMfunction mfunction : module.getFunctionMap().values()) {
             queue.offer(mfunction);
             isInQueue.add(mfunction);
         }
@@ -214,7 +211,7 @@ public class SideEffectChecker extends IRPass {
         }
     }
 
-    private void checkNoProblem(){
+    private void checkNoProblem() {
         for (LLVMfunction function : module.getFunctionMap().values()) {
             for (Block block : function.getBlocks()) {
                 LLVMInstruction ptr = block.getInstHead();

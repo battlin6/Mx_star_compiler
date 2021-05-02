@@ -3,16 +3,17 @@ package AST.Visit;
 import AST.*;
 import AST.Location.Location;
 import AST.NodeProperties.*;
-
 import Semantic.ExceptionHandle.ExceptionListener;
-import Semantic.ParserAndLexer.*;
+import Semantic.ParserAndLexer.MXgrammarBaseVisitor;
+import Semantic.ParserAndLexer.MXgrammarParser;
 
 import java.util.ArrayList;
 
 public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
 
     private ExceptionListener exceptionListener;
-    public ASTBuilder(ExceptionListener exceptionListener){
+
+    public ASTBuilder(ExceptionListener exceptionListener) {
         this.exceptionListener = exceptionListener;
     }
 
@@ -25,13 +26,13 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         TypeNode type = (TypeNode) visit(ctx.type());
         NonArrayTypeNode baseType = null;
         int dim = 0;
-        if(type instanceof NonArrayTypeNode){
+        if (type instanceof NonArrayTypeNode) {
             baseType = (NonArrayTypeNode) type;
             dim = 1;
-        }else if(type instanceof ArrayTypeNode){
+        } else if (type instanceof ArrayTypeNode) {
             baseType = ((ArrayTypeNode) type).getBaseType();
             dim = ((ArrayTypeNode) type).getDim() + 1;
-        }else{
+        } else {
             exceptionListener.errorOut(location, "Unknown Error");
         }
 
@@ -103,12 +104,12 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         String text = ctx.getText();
         NonArrayTypeNode baseType = new NonArrayTypeNode(ctx.nonArray().getText(), location);
         int dim = 0;
-        for(var child : ctx.children)
-            if(child.getText().equals("["))
+        for (var child : ctx.children)
+            if (child.getText().equals("["))
                 dim++;
 
         ArrayList<ExprNode> lenPerDim = new ArrayList<>();
-        for(var expr : ctx.expr())
+        for (var expr : ctx.expr())
             lenPerDim.add((ExprNode) visit(expr));
 
         return new NewExprNode_array(text, location, baseType, dim, lenPerDim);
@@ -118,7 +119,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
     public ASTNode visitWrong_newType(MXgrammarParser.Wrong_newTypeContext ctx) {
         Location location = Location.getTokenLoc(ctx.getStart());
         String text = ctx.getText();
-        exceptionListener.errorOut(location, "Wrong New Type:"+ctx.getText());
+        exceptionListener.errorOut(location, "Wrong New Type:" + ctx.getText());
 
         return super.visitWrong_newType(ctx); //maybe some error
     }
@@ -138,10 +139,10 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         String text = ctx.getText();
         ExprNode func_name = (ExprNode) visit(ctx.func_name);
         ArrayList<ExprNode> paras;
-        if(ctx.exprs() != null){
+        if (ctx.exprs() != null) {
             FuncExprNode exprs = (FuncExprNode) visit(ctx.exprs());
             paras = exprs.getParas();
-        }else{
+        } else {
             paras = new ArrayList<ExprNode>();
         }
         return new FuncExprNode(text, location, func_name, paras);
@@ -152,7 +153,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         Location location = Location.getTokenLoc(ctx.getStart());
         String text = ctx.getText();
         ArrayList<ExprNode> paras = new ArrayList<ExprNode>();
-        for(var expr: ctx.expr()){
+        for (var expr : ctx.expr()) {
             paras.add((ExprNode) visit(expr));
         }
         return new FuncExprNode(text, location, null, paras);
@@ -208,7 +209,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         String text = ctx.getText();
         String id = ctx.ID().getText();
         ExprNode initValue;
-        if(ctx.expr() != null)
+        if (ctx.expr() != null)
             initValue = (ExprNode) visit(ctx.expr());
         else
             initValue = null;
@@ -221,7 +222,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         String text = ctx.getText();
         ArrayList<VarDefOneNode> varDefs = new ArrayList<VarDefOneNode>();
         TypeNode type = (TypeNode) visit(ctx.type());
-        for(var varDef : ctx.varDefOne()){
+        for (var varDef : ctx.varDefOne()) {
             VarDefOneNode varDefOneNode = (VarDefOneNode) visit(varDef);
             varDefOneNode.setTypeNode(type);
             varDefs.add(varDefOneNode);
@@ -241,7 +242,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         Location location = Location.getTokenLoc(ctx.getStart());
         String text = ctx.getText();
         ArrayList<StatementNode> statements = new ArrayList<>();
-        for(var statement : ctx.statement()){
+        for (var statement : ctx.statement()) {
             StatementNode statementNode = (StatementNode) visit(statement);
             statements.add(statementNode);
         }
@@ -262,7 +263,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         ExprNode cond = (ExprNode) visit(ctx.cond);
         StatementNode then_st = (StatementNode) visit(ctx.then_st);
         StatementNode else_st = null;
-        if(ctx.else_st != null){
+        if (ctx.else_st != null) {
             else_st = (StatementNode) visit(ctx.else_st);
         }
         return new IfNode(text, location, cond, then_st, else_st);
@@ -273,7 +274,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         Location location = Location.getTokenLoc(ctx.getStart());
         String text = ctx.getText();
         ExprNode cond = null;
-        if(ctx.cond != null)
+        if (ctx.cond != null)
             cond = (ExprNode) visit(ctx.cond);
         StatementNode statement = (StatementNode) visit(ctx.statement());
         return new WhileNode(text, location, cond, statement);
@@ -284,13 +285,13 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         Location location = Location.getTokenLoc(ctx.getStart());
         String text = ctx.getText();
         BlockNode for_init = null;
-        if(ctx.for_init() != null)
+        if (ctx.for_init() != null)
             for_init = (BlockNode) visit(ctx.for_init());
         ExprNode cond = null;
-        if(ctx.cond != null)
+        if (ctx.cond != null)
             cond = (ExprNode) visit(ctx.cond);
         BlockNode for_update = null;
-        if(ctx.for_update() != null)
+        if (ctx.for_update() != null)
             for_update = (BlockNode) visit(ctx.for_update());
         StatementNode statement = (StatementNode) visit(ctx.statement());
         return new ForNode(text, location, for_init, cond, for_update, statement);
@@ -313,7 +314,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         Location location = Location.getTokenLoc(ctx.getStart());
         String text = ctx.getText();
         ArrayList<StatementNode> statements = new ArrayList<>();
-        for(var expr : ctx.expr()){
+        for (var expr : ctx.expr()) {
             ExprNode exprNode = (ExprNode) visit(expr);
             //package into a statementNode
             ExprStNode exprStNode = new ExprStNode(exprNode.getText(), exprNode.getLocation(), exprNode);
@@ -328,7 +329,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         Location location = Location.getTokenLoc(ctx.getStart());
         String text = ctx.getText();
         ArrayList<StatementNode> statements = new ArrayList<>();
-        for(var expr : ctx.expr()){
+        for (var expr : ctx.expr()) {
             ExprNode exprNode = (ExprNode) visit(expr);
             //package into a statementNode
             ExprStNode exprStNode = new ExprStNode(exprNode.getText(), exprNode.getLocation(), exprNode);
@@ -343,7 +344,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         Location location = Location.getTokenLoc(ctx.getStart());
         String text = ctx.getText();
         ExprNode returnExpr = null;
-        if(ctx.expr() != null)
+        if (ctx.expr() != null)
             returnExpr = (ExprNode) visit(ctx.expr());
         return new ReturnNode(text, location, returnExpr);
     }
@@ -384,11 +385,11 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         Location location = Location.getTokenLoc(ctx.getStart());
         String text = ctx.getText();
         TypeNode returnType = null;
-        if(ctx.type() != null)  //not void
+        if (ctx.type() != null)  //not void
             returnType = (TypeNode) visit(ctx.type());
         String func_name = ctx.ID().getText();
         ArrayList<FormalParaNode> paras = new ArrayList<FormalParaNode>();
-        for(var formalPara : ctx.formalPara()){
+        for (var formalPara : ctx.formalPara()) {
             paras.add((FormalParaNode) visit(formalPara));
         }
         BlockNode func_body = (BlockNode) visit(ctx.block());
@@ -412,7 +413,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         String text = ctx.getText();
         String classTypeId = ctx.ID().getText();
         ArrayList<FormalParaNode> paras = new ArrayList<FormalParaNode>();
-        for(var formalPara : ctx.formalPara()){
+        for (var formalPara : ctx.formalPara()) {
             paras.add((FormalParaNode) visit(formalPara));
         }
         BlockNode func_body = (BlockNode) visit(ctx.block());
@@ -427,20 +428,20 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         ArrayList<VarDefOneNode> varMembers = new ArrayList<VarDefOneNode>();
         ArrayList<FuncDefNode> funcMembers = new ArrayList<FuncDefNode>();
         ConstructDefNode constructor = null;    //default is null
-        for(var varDef : ctx.varDef()){
+        for (var varDef : ctx.varDef()) {
             VarDefNode varDefNode = (VarDefNode) visit(varDef);
             varMembers.addAll(varDefNode.getVarDefs());     //check var has no rename***********************************
         }
-        for(var funcDef : ctx.funcDef()){
+        for (var funcDef : ctx.funcDef()) {
             funcMembers.add((FuncDefNode) visit(funcDef));
         }
-        for(var constructDef : ctx.constructDef()){
-            if(constructor != null)
+        for (var constructDef : ctx.constructDef()) {
+            if (constructor != null)
                 exceptionListener.errorOut(visit(constructDef).getLocation(),
                         "Duplicate declarations of class constructor");
             constructor = (ConstructDefNode) visit(constructDef);
         }
-        if(constructor != null && !constructor.getClassName().equals(class_name))
+        if (constructor != null && !constructor.getClassName().equals(class_name))
             exceptionListener.errorOut(location, "Constructor name error");
         return new ClassDefNode(text, location, class_name, varMembers, funcMembers, constructor);
     }
@@ -449,13 +450,13 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitDefUnit(MXgrammarParser.DefUnitContext ctx) {
-        if(ctx.classDef() != null){
+        if (ctx.classDef() != null) {
             return visit(ctx.classDef());
-        }else if(ctx.funcDef() != null){
+        } else if (ctx.funcDef() != null) {
             return visit(ctx.funcDef());
-        }else if(ctx.varDef() != null){
+        } else if (ctx.varDef() != null) {
             return visit(ctx.varDef());
-        }else{
+        } else {
             return null;
         }
     }
@@ -465,7 +466,7 @@ public class ASTBuilder extends MXgrammarBaseVisitor<ASTNode> {
         Location location = Location.getTokenLoc(ctx.getStart());
         String text = ctx.getText();
         ArrayList<DefUnitNode> defUnits = new ArrayList<>();
-        for(var defUnit : ctx.defUnit()){
+        for (var defUnit : ctx.defUnit()) {
             defUnits.add((DefUnitNode) visit(defUnit));
         }
         return new ProgramNode(text, location, defUnits);

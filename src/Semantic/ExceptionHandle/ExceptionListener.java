@@ -10,29 +10,29 @@ public class ExceptionListener extends BaseErrorListener {
     private int warningNum;
     private boolean warningOption;
 
-    public ExceptionListener(){
+    public ExceptionListener() {
         errorNum = 0;
         warningNum = 0;
         warningOption = true;
     }
 
-    public void errorOut(Location location, String msg){
+    public void errorOut(Location location, String msg) {
         errorNum++;
         System.out.println(String.format("Error %d ", errorNum) + location.toString() + msg);
     }
 
-    public void errorOut(CompileError e){
+    public void errorOut(CompileError e) {
         Location location = e.getLocation();
         String msg = e.getMsg();
         errorOut(location, msg);
     }
 
-    public void setWarningOption(boolean warningOption){
+    public void setWarningOption(boolean warningOption) {
         this.warningOption = warningOption;
     }
 
-    public void warningOut(Location location, String msg){
-        if(warningOption){
+    public void warningOut(Location location, String msg) {
+        if (warningOption) {
             warningNum++;
             System.out.println(String.format("Warning %d", warningNum) + location.toString() + msg);
         }
@@ -41,10 +41,10 @@ public class ExceptionListener extends BaseErrorListener {
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
                             String msg, RecognitionException e) {
-        errorOut(new Location(line, charPositionInLine), "(Antlr Auto Error) "+msg);
+        errorOut(new Location(line, charPositionInLine), "(Antlr Auto Error) " + msg);
     }
 
-    public int getErrorNum(){
+    public int getErrorNum() {
         return this.errorNum;
     }
 

@@ -2,7 +2,7 @@ package IR.TypeSystem;
 
 import IR.LLVMoperand.Operand;
 
-public class LLVMVoidType extends LLVMtype{
+public class LLVMVoidType extends LLVMtype {
     @Override
     public String toString() {
         return "void";

@@ -13,19 +13,19 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-abstract public class LLVMInstruction implements Cloneable{
+abstract public class LLVMInstruction implements Cloneable {
     private Block block;
     private LLVMInstruction preInst;
     private LLVMInstruction postInst;
     private String comment;
 
-    public void removeFromBlock(){
-        if(preInst == null)
+    public void removeFromBlock() {
+        if (preInst == null)
             block.setInstHead(postInst);
         else
             preInst.setPostInst(postInst);
 
-        if(postInst == null)
+        if (postInst == null)
             block.setInstTail(preInst);
         else
             postInst.setPreInst(preInst);
@@ -33,7 +33,7 @@ abstract public class LLVMInstruction implements Cloneable{
 
     abstract public void overrideObject(Object oldUse, Object newUse);
 
-    public boolean isTerminalInst(){
+    public boolean isTerminalInst() {
         return this instanceof BranchInst || this instanceof ReturnInst;
     }
 

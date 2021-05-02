@@ -18,12 +18,12 @@ public class LLVMfunction {
 
     private Block initBlock;
     private Block returnBlock;
-    private Block exitBlock;    //gugu changed: act as the last block, maybe can be changed
+    private Block exitBlock;
 
     private HashMap<String, HashMap<String, Register>> varNameManager;
     private HashMap<String, HashMap<String, Block>> blockNameManager;
 
-    private Map<LLVMInstruction, Integer> use;  //gugu changed: name can be modified
+    private Map<LLVMInstruction, Integer> use;
 
 
     private boolean sideEffect;
@@ -45,18 +45,18 @@ public class LLVMfunction {
         this.use = new LinkedHashMap<>();
     }
 
-    public void registerBlock(String name, Block block){
+    public void registerBlock(String name, Block block) {
         registerBlockName(name, block);
 
         addBlock(block);
     }
 
-    public void registerBlockName(String name, Block block){
+    public void registerBlockName(String name, Block block) {
         HashMap<String, Block> sameNameMap;
-        if(blockNameManager.containsKey(name)){
+        if (blockNameManager.containsKey(name)) {
             sameNameMap = blockNameManager.get(name);
-        }else{
-            sameNameMap = new HashMap<String , Block>();
+        } else {
+            sameNameMap = new HashMap<String, Block>();
             blockNameManager.put(name, sameNameMap);
         }
         String newName = name + "." + sameNameMap.size();
@@ -64,17 +64,22 @@ public class LLVMfunction {
         sameNameMap.put(newName, block);
     }
 
-    public void registerVar(String name, Register register){
+    public void registerVar(String name, Register register) {
         HashMap<String, Register> sameNameMap;
-        if(varNameManager.containsKey(name)){
+        if (varNameManager.containsKey(name)) {
             sameNameMap = varNameManager.get(name);
-        }else{
+        } else {
             sameNameMap = new HashMap<String, Register>();
             varNameManager.put(name, sameNameMap);
         }
         String newName = name + "." + sameNameMap.size();
         register.setName(newName);
         sameNameMap.put(newName, register);
+    }
+
+
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 
     public String printDeclaratiion() {
@@ -95,24 +100,20 @@ public class LLVMfunction {
         return string.toString();
     }
 
-    public void accept(IRVisitor visitor) {
-        visitor.visit(this);
-    }
-
-    public void addUse(LLVMInstruction instruction){
-        if(!use.containsKey(instruction)){
-            use.put(instruction,1);
-        }else{
+    public void addUse(LLVMInstruction instruction) {
+        if (!use.containsKey(instruction)) {
+            use.put(instruction, 1);
+        } else {
             use.put(instruction, use.get(instruction) + 1);
         }
     }
 
-    public void removeUse(LLVMInstruction instruction){
+    public void removeUse(LLVMInstruction instruction) {
         int cnt = use.get(instruction);
-        if(cnt == 1)
+        if (cnt == 1)
             use.remove(instruction);
         else
-            use.replace(instruction, cnt-1);
+            use.replace(instruction, cnt - 1);
     }
 
     public Map<LLVMInstruction, Integer> getUse() {
@@ -120,38 +121,37 @@ public class LLVMfunction {
     }
 
     public void addBlock(Block block) {
-        if (exitBlock == null){
+        if (exitBlock == null) {
             initBlock = exitBlock = block;
-        }
-        else{
+        } else {
             exitBlock.appendBlock(block);
             exitBlock = block;
         }
     }
 
-    public boolean isFunctional(){
-        int returnCount  = 0;
+    public boolean isFunctional() {
+        int returnCount = 0;
         ReturnInst returnInst = null;
-        for(Block block = initBlock; block != null; block = block.getNext()){
+        for (Block block = initBlock; block != null; block = block.getNext()) {
             LLVMInstruction instTail = block.getInstTail();
-            if(instTail == null || !instTail.isTerminalInst()){
-                return false;                        //gugu changed: why??
+            if (instTail == null || !instTail.isTerminalInst()) {
+                return false;
             }
-            if(instTail instanceof ReturnInst){
+            if (instTail instanceof ReturnInst) {
                 returnInst = (ReturnInst) instTail;
                 returnCount++;
-                if(returnCount > 1)
-                    return false;                    //gugu changed: unpossible situation
+                if (returnCount > 1)
+                    return false;
             }
         }
         Block block = returnInst.getBlock();
-        if(block != this.exitBlock){            //gugu changed
+        if (block != this.exitBlock) {
             //move to exit
-            if(block.getPrev() == null)
+            if (block.getPrev() == null)
                 this.setInitBlock(block.getNext());
             else
                 block.getPrev().setNext(block.getNext());
-            if(block.getNext() == null)
+            if (block.getNext() == null)
                 this.setExitBlock(block.getPrev());
             else
                 block.getNext().setPrev(block.getPrev());
@@ -165,20 +165,20 @@ public class LLVMfunction {
 
     public ArrayList<Block> getDFSOrder() {
         ArrayList<Block> dfsOrder = new ArrayList<>();
-        HashSet<Block>dfsVisit = new HashSet<>();
+        HashSet<Block> dfsVisit = new HashSet<>();
         Stack<Block> blockStack = new Stack<>();
 
         initBlock.setDfsParent(null);
         blockStack.push(initBlock);
 
-        while(!blockStack.empty()){
+        while (!blockStack.empty()) {
             Block currentBlock = blockStack.pop();
-            if(!dfsVisit.contains(currentBlock)){
+            if (!dfsVisit.contains(currentBlock)) {
                 currentBlock.setDfsNum(dfsOrder.size());
                 dfsOrder.add(currentBlock);
                 dfsVisit.add(currentBlock);
-                for(Block successor : currentBlock.getSuccessors()){
-                    if(!dfsVisit.contains(successor)){
+                for (Block successor : currentBlock.getSuccessors()) {
+                    if (!dfsVisit.contains(successor)) {
                         successor.setDfsParent(currentBlock);
                         blockStack.push(successor);
                     }
@@ -190,21 +190,21 @@ public class LLVMfunction {
     }
 
     public ArrayList<Block> getReverseDFSOrder() {
-        ArrayList<Block>reverseDfsOrder = new ArrayList<>();
-        HashSet<Block>dfsVisit = new HashSet<>();
+        ArrayList<Block> reverseDfsOrder = new ArrayList<>();
+        HashSet<Block> dfsVisit = new HashSet<>();
         Stack<Block> blockStack = new Stack<>();
 
         initBlock.setR_dfsParent(null);
         blockStack.push(exitBlock);
 
-        while(!blockStack.empty()){
+        while (!blockStack.empty()) {
             Block currentBlock = blockStack.pop();
-            if(!dfsVisit.contains(currentBlock)){
+            if (!dfsVisit.contains(currentBlock)) {
                 currentBlock.setR_dfsNum(reverseDfsOrder.size());
                 reverseDfsOrder.add(currentBlock);
                 dfsVisit.add(currentBlock);
-                for(Block predecessor : currentBlock.getPredecessors()){
-                    if(!dfsVisit.contains(predecessor)){
+                for (Block predecessor : currentBlock.getPredecessors()) {
+                    if (!dfsVisit.contains(predecessor)) {
                         predecessor.setR_dfsParent(currentBlock);
                         blockStack.push(predecessor);
                     }
@@ -214,10 +214,6 @@ public class LLVMfunction {
 
         return reverseDfsOrder;
     }
-
-
-
-
 
 
     public String getFunctionName() {

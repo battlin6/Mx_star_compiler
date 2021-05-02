@@ -13,7 +13,7 @@ public class NonArrayTypeNode extends TypeNode {
         this.typeName = text;
     }
 
-    public String getTypeName(){
+    public String getTypeName() {
         return this.typeName;
     }
 

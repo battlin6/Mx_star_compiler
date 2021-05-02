@@ -22,16 +22,16 @@ public class ASMFunction {
     private Map<String, VirtualASMRegister> VRSymbolTable;
 
     //for VRsymboltable
-    public void registerVR(VirtualASMRegister virtualASMRegister){
+    public void registerVR(VirtualASMRegister virtualASMRegister) {
         String name = virtualASMRegister.getName();
         assert !VRSymbolTable.containsKey(name);
         VRSymbolTable.put(name, virtualASMRegister);
     }
 
-    public void registerVRDuplicateName(VirtualASMRegister virtualASMRegister){
+    public void registerVRDuplicateName(VirtualASMRegister virtualASMRegister) {
         int postfix = 0;
         String newName = name + "." + postfix;
-        while(VRSymbolTable.containsKey(newName)){
+        while (VRSymbolTable.containsKey(newName)) {
             postfix++;
             newName = name + "." + postfix;
         }
@@ -39,7 +39,7 @@ public class ASMFunction {
         VRSymbolTable.put(newName, virtualASMRegister);
     }
 
-    public boolean contains(String name){
+    public boolean contains(String name) {
         return VRSymbolTable.containsKey(name);
     }
 

@@ -14,19 +14,30 @@ public interface IRVisitor {
 
 
     void visit(ReturnInst inst);
+
     void visit(BranchInst inst);
+
     void visit(BinaryOpInst inst);
+
     void visit(AllocInst inst);
+
     void visit(LoadInst inst);
+
     void visit(StoreInst inst);
+
     void visit(GEPInst inst);
+
     void visit(BitCastInst inst);
+
     void visit(IcmpInst inst);
+
     void visit(CallInst inst);
+
     void visit(PhiInst inst);
 
     void visit(DefineGlobal defineGlobal);
 
     void visit(MoveInst moveInst);
+
     void visit(ParallelCopyInst parallelCopyInst);
 }

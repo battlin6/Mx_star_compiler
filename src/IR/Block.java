@@ -7,7 +7,7 @@ import Utility.Pair;
 
 import java.util.*;
 
-public class Block implements Cloneable{
+public class Block implements Cloneable {
     private String name;
     private LLVMfunction function;
 
@@ -58,13 +58,13 @@ public class Block implements Cloneable{
         this.use = new LinkedHashMap<>();   //why linkedHashMap ? gugu changed
     }
 
-    public void addInst(LLVMInstruction newInstruction){
+    public void addInst(LLVMInstruction newInstruction) {
         updateTerminal();
-        if(!Terminal){
-            if(instHead == null && instTail == null){
+        if (!Terminal) {
+            if (instHead == null && instTail == null) {
                 instHead = newInstruction;
                 instTail = newInstruction;
-            }else{
+            } else {
                 instTail.setPostInst(newInstruction);
                 newInstruction.setPreInst(instTail);    //gugu changed
                 instTail = newInstruction;
@@ -72,26 +72,26 @@ public class Block implements Cloneable{
             /*more to do with specific instruction adding*/
             afterAddInst(newInstruction);
 
-        }else{
+        } else {
             //is Terminal and do nothing
 
         }
     }
 
-    public void updateTerminal(){
-        if(instTail instanceof BranchInst || instTail instanceof ReturnInst){
+    public void updateTerminal() {
+        if (instTail instanceof BranchInst || instTail instanceof ReturnInst) {
             Terminal = true;
-        }else{
+        } else {
             Terminal = false;
         }
     }
 
-    public void addInstFront(LLVMInstruction newInstruction){
-        if(instHead == null && instTail == null){
+    public void addInstFront(LLVMInstruction newInstruction) {
+        if (instHead == null && instTail == null) {
             instTail = newInstruction;
             instHead = newInstruction;
             afterAddInst(newInstruction);
-        }else{
+        } else {
             instHead.setPreInst(newInstruction);
             newInstruction.setPostInst(instHead);
             instHead = newInstruction;
@@ -99,12 +99,12 @@ public class Block implements Cloneable{
         }
     }
 
-    public void afterAddInst(LLVMInstruction newInstruction){
+    public void afterAddInst(LLVMInstruction newInstruction) {
         //BranchInst
-        if(newInstruction instanceof BranchInst){
+        if (newInstruction instanceof BranchInst) {
             Terminal = true;
             BranchInst branchInst = (BranchInst) newInstruction;
-            if(branchInst.getCondition() != null){
+            if (branchInst.getCondition() != null) {
                 Block thenBlock = branchInst.getIfTrueBlock();
                 Block elseBlock = branchInst.getIfFalseBlock();
                 Block block = branchInst.getBlock();
@@ -118,7 +118,7 @@ public class Block implements Cloneable{
                 cond.addUse(branchInst);
                 thenBlock.addUse(branchInst);
                 elseBlock.addUse(branchInst);
-            }else{
+            } else {
                 Block thenBlock = branchInst.getIfTrueBlock();
                 Block block = branchInst.getBlock();
 
@@ -129,23 +129,23 @@ public class Block implements Cloneable{
             }
         }
         //ReturnInst
-        else if(newInstruction instanceof ReturnInst){
+        else if (newInstruction instanceof ReturnInst) {
             Terminal = true;
             ReturnInst returnInst = (ReturnInst) newInstruction;
             Operand returnValue = returnInst.getReturnValue();
 
-            if(returnValue != null)
+            if (returnValue != null)
                 returnValue.addUse(returnInst);
         }
         //AlloInst
-        else if(newInstruction instanceof AllocInst){
+        else if (newInstruction instanceof AllocInst) {
             AllocInst allocInst = (AllocInst) newInstruction;
             Register result = allocInst.getResult();
 
             result.setDef(allocInst);
         }
         //BinaryOpInst
-        else if(newInstruction instanceof BinaryOpInst){
+        else if (newInstruction instanceof BinaryOpInst) {
             BinaryOpInst binaryOpInst = (BinaryOpInst) newInstruction;
             Register result = binaryOpInst.getResult();
             Operand lhs = binaryOpInst.getLhs();
@@ -156,7 +156,7 @@ public class Block implements Cloneable{
             rhs.addUse(binaryOpInst);//gugu changed: lhs/rhs may be not const
         }
         //BitCastInst
-        else if(newInstruction instanceof BitCastInst){
+        else if (newInstruction instanceof BitCastInst) {
             BitCastInst bitCastInst = (BitCastInst) newInstruction;
             Operand source = bitCastInst.getSource();
             Register result = bitCastInst.getResult();
@@ -165,21 +165,21 @@ public class Block implements Cloneable{
             source.addUse(bitCastInst);
         }
         //callInst
-        else if(newInstruction instanceof CallInst){
+        else if (newInstruction instanceof CallInst) {
             CallInst callInst = (CallInst) newInstruction;
             ArrayList<Operand> paras = callInst.getParas();
             Register result = callInst.getResult();
             LLVMfunction function = callInst.getLlvMfunction();
-            for(Operand para: paras){
+            for (Operand para : paras) {
                 para.addUse(callInst);
             }
-            if(result != null){
+            if (result != null) {
                 result.setDef(callInst);
             }
             function.addUse(callInst);
         }
         //GEPInst
-        else if(newInstruction instanceof GEPInst){
+        else if (newInstruction instanceof GEPInst) {
             GEPInst gepInst = (GEPInst) newInstruction;
             ArrayList<Operand> indexs = gepInst.getIndexs();
             Register result = gepInst.getResult();
@@ -187,13 +187,13 @@ public class Block implements Cloneable{
 
             result.setDef(gepInst);
             pointer.addUse(gepInst);
-            for(Operand operand:indexs){
+            for (Operand operand : indexs) {
                 operand.addUse(gepInst);
             }
         }
         //IcmpInst
-        else if(newInstruction instanceof IcmpInst){
-            IcmpInst icmpInst  = (IcmpInst) newInstruction;
+        else if (newInstruction instanceof IcmpInst) {
+            IcmpInst icmpInst = (IcmpInst) newInstruction;
             Register result = icmpInst.getResult();
             Operand op1 = icmpInst.getOp1();
             Operand op2 = icmpInst.getOp2();
@@ -203,7 +203,7 @@ public class Block implements Cloneable{
             op2.addUse(icmpInst);
         }
         //LoadInst
-        else if(newInstruction instanceof LoadInst){
+        else if (newInstruction instanceof LoadInst) {
             LoadInst loadInst = (LoadInst) newInstruction;
             Register result = loadInst.getResult();
             Operand addr = loadInst.getAddr();
@@ -212,7 +212,7 @@ public class Block implements Cloneable{
             addr.addUse(loadInst);
         }
         //StoreInst
-        else if(newInstruction instanceof StoreInst){
+        else if (newInstruction instanceof StoreInst) {
             StoreInst storeInst = (StoreInst) newInstruction;
             Operand value = storeInst.getValue();
             Operand addr = storeInst.getAddr();
@@ -221,12 +221,12 @@ public class Block implements Cloneable{
             addr.addUse(storeInst);
         }
         //PhiInst
-        else if(newInstruction instanceof PhiInst){
+        else if (newInstruction instanceof PhiInst) {
             PhiInst phiInst = (PhiInst) newInstruction;
             Set<Pair<Operand, Block>> branches = phiInst.getBranches();
             Register result = phiInst.getResult();
 
-            for(Pair<Operand, Block> branch: branches){
+            for (Pair<Operand, Block> branch : branches) {
                 Operand operand = branch.getFirst();
                 Block block = branch.getSecond();
                 operand.addUse(phiInst);
@@ -235,7 +235,7 @@ public class Block implements Cloneable{
             result.setDef(phiInst);
         }
         //moveInst
-        else if(newInstruction instanceof MoveInst){
+        else if (newInstruction instanceof MoveInst) {
             MoveInst moveInst = (MoveInst) newInstruction;
             Operand source = moveInst.getSource();
             Register result = moveInst.getResult();
@@ -244,7 +244,7 @@ public class Block implements Cloneable{
             result.setDef(moveInst);
         }
         //ParallelCopyInst
-        else if(newInstruction instanceof ParallelCopyInst){
+        else if (newInstruction instanceof ParallelCopyInst) {
             //nothing
         }
     }
@@ -281,23 +281,23 @@ public class Block implements Cloneable{
         visitor.visit(this);
     }
 
-    public void addUse(LLVMInstruction instruction){
-        if(!use.containsKey(instruction)){
-            use.put(instruction,1);
-        }else{
+    public void addUse(LLVMInstruction instruction) {
+        if (!use.containsKey(instruction)) {
+            use.put(instruction, 1);
+        } else {
             use.put(instruction, use.get(instruction) + 1);
         }
     }
 
-    public void removeUse(LLVMInstruction instruction){
+    public void removeUse(LLVMInstruction instruction) {
         int cnt = use.get(instruction);
-        if(cnt == 1)
+        if (cnt == 1)
             use.remove(instruction);
         else
-            use.replace(instruction, cnt-1);
+            use.replace(instruction, cnt - 1);
     }
 
-    public void cutSuccessor(Block block){
+    public void cutSuccessor(Block block) {
         this.getSuccessors().remove(block);
         block.getPredecessors().remove(this);
     }
@@ -311,59 +311,59 @@ public class Block implements Cloneable{
         }
     }
 
-    public void removeFromFunction(){
+    public void removeFromFunction() {
         LLVMInstruction instruction = instHead;
-        while(instruction != null){
+        while (instruction != null) {
             LLVMInstruction nextInstruction = instruction.getPostInst();
             instruction.removeFromBlock();
             instruction = nextInstruction;
         }
-        for(Block successor : successors)
+        for (Block successor : successors)
             successor.cutBlockForPhi(successor);
 
         removeFromList();
         cutCFGLink();
     }
 
-    public void removeFromList(){
+    public void removeFromList() {
         assert prev != null;        //gugu changed: never delete initBlock??
         prev.setNext(next);
-        if(next == null)
+        if (next == null)
             function.setExitBlock(prev);
         else
             next.setPrev(prev);
     }
 
-    public void cutCFGLink(){
+    public void cutCFGLink() {
         Iterator<Block> iterator;
         iterator = predecessors.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Block predecessor = iterator.next();
             predecessor.getSuccessors().remove(this);
             iterator.remove();
         }
         iterator = successors.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Block successor = iterator.next();
             successor.getPredecessors().remove(this);
             iterator.remove();
         }
     }
 
-    public void justAddInst(LLVMInstruction instruction){
+    public void justAddInst(LLVMInstruction instruction) {
         instruction.setBlock(this);
         instruction.setPreInst(this.instTail);
-        if(this.instHead == null && this.instTail == null){
+        if (this.instHead == null && this.instTail == null) {
             this.instHead = instruction;
-        }else{
+        } else {
             this.instTail.setPostInst(instruction);
         }
         this.instTail = instruction;
     }
 
-    public void beOverriden(Object newUse){
+    public void beOverriden(Object newUse) {
         ArrayList<LLVMInstruction> instructions = new ArrayList<>(use.keySet());
-        for(LLVMInstruction instruction : instructions){
+        for (LLVMInstruction instruction : instructions) {
             instruction.overrideObject(this, newUse);
         }
         use.clear();
@@ -422,7 +422,7 @@ public class Block implements Cloneable{
         this.next = next;
     }
 
-    public boolean hasPredecessor(){
+    public boolean hasPredecessor() {
         return this.getPredecessors().size() != 0;
     }
 
@@ -539,7 +539,6 @@ public class Block implements Cloneable{
     }
 
 
-
     public ArrayList<LLVMInstruction> getInstructions() {
         ArrayList<LLVMInstruction> instructions = new ArrayList<>();
         LLVMInstruction ptr = instHead;
@@ -617,7 +616,7 @@ public class Block implements Cloneable{
         return true;
     }
 
-    public void fixBlockOfInstruction(){
+    public void fixBlockOfInstruction() {
         LLVMInstruction ptr = instHead;
         while (ptr != null) {
             ptr.setBlock(this);
@@ -625,7 +624,7 @@ public class Block implements Cloneable{
         }
     }
 
-    public Block makeCopy(){
+    public Block makeCopy() {
         Block block = new Block(this.getName(), this.function);
         block.setUse(new LinkedHashMap<>());
         ArrayList<LLVMInstruction> instructions = new ArrayList<>();
@@ -656,10 +655,7 @@ public class Block implements Cloneable{
     }
 
 
-
-
-
-    public Block split(LLVMInstruction instruction){
+    public Block split(LLVMInstruction instruction) {
         Block splitBlock = new Block("inlineMergeBlock", function);
         function.registerBlockName(splitBlock.getName(), splitBlock);
 //        function.getSymbolTable().put(splitBlock.getName(), splitBlock);

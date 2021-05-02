@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-public class StoreInst extends LLVMInstruction{
+public class StoreInst extends LLVMInstruction {
     private Operand value;
     private Operand addr;   //pointType
 
@@ -41,12 +41,12 @@ public class StoreInst extends LLVMInstruction{
 
     @Override
     public void overrideObject(Object oldUse, Object newUse) {
-        if(value == oldUse){
+        if (value == oldUse) {
             value.removeUse(this);
             value = (Operand) newUse;
             value.addUse(this);
         }
-        if(addr == oldUse){
+        if (addr == oldUse) {
             addr.removeUse(this);
             addr = (Operand) newUse;
             addr.addUse(this);

@@ -25,15 +25,14 @@ public class AllocInst extends LLVMInstruction {
     }
 
 
-
-
     @Override
     public String toString() {
         return result.toString() + " = alloca " + llvMtype.toString();
     }
 
     @Override
-    public void overrideObject(Object oldUse, Object newUse) { }
+    public void overrideObject(Object oldUse, Object newUse) {
+    }
 
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

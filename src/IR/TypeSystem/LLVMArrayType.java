@@ -18,7 +18,7 @@ public class LLVMArrayType extends LLVMtype {
 
     @Override
     public String toString() {
-        return "[" + length + " " + "x" + " " + baseType.toString() +  "]";
+        return "[" + length + " " + "x" + " " + baseType.toString() + "]";
     }
 
     @Override

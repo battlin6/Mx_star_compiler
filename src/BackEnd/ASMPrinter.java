@@ -11,7 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-public class ASMPrinter implements ASMVisitor{
+public class ASMPrinter implements ASMVisitor {
     PrintStream stdout;
     PrintStream newout;
     String indent;
@@ -20,18 +20,18 @@ public class ASMPrinter implements ASMVisitor{
     public ASMPrinter(String fileName) throws FileNotFoundException {
         stdout = System.out;
         indent = "    ";
-        if(fileName != null)
+        if (fileName != null)
             newout = new PrintStream(fileName);
         else
             newout = System.out;
     }
 
     private void print(String string) {
-            System.out.print(string);
+        System.out.print(string);
     }
 
     private void println(String string) {
-            System.out.println(string);
+        System.out.println(string);
     }
 
     public void run(ASMModule ASMModule) {
@@ -84,7 +84,7 @@ public class ASMPrinter implements ASMVisitor{
 
         ASMInstruction ptr = block.getInstHead();
         while (ptr != null) {
-                println(ptr.emitCode());
+            println(ptr.emitCode());
             ptr = ptr.getNextInst();
         }
     }

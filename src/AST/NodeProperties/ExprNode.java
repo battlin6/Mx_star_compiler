@@ -5,7 +5,7 @@ import AST.VariableEntity.VariableEntity;
 import IR.LLVMoperand.Operand;
 import Semantic.ASTtype.Type;
 
-abstract public class ExprNode extends ASTNode{
+abstract public class ExprNode extends ASTNode {
     private Boolean lvalue;
     private Type exprType;
     private VariableEntity variableEntity;  //only used by this and id node
@@ -13,6 +13,7 @@ abstract public class ExprNode extends ASTNode{
     //IR
     private Operand result;
     private Operand allocAddr;
+
     public ExprNode(String text, Location location) {
         super(text, location);
     }

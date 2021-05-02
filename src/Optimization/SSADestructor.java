@@ -26,8 +26,8 @@ public class SSADestructor extends IRPass {
         return false;
     }
 
-    public void destructFunction(LLVMfunction mfunction){
-        for(Block block : mfunction.getDFSOrder()){
+    public void destructFunction(LLVMfunction mfunction) {
+        for (Block block : mfunction.getDFSOrder()) {
             addCriticalBlock(block);
         }
         for (Block block : mfunction.getBlocks()) {
@@ -56,11 +56,11 @@ public class SSADestructor extends IRPass {
                 phiInst.getResult().beOverriden(imcomeResult);
                 phiInst.removeFromBlock();
             }
-        }else{
+        } else {
             for (Block predecessor : predecessors) {
                 ParallelCopyInst parallelCopyInst;
                 if (predecessor.getSuccessors().size() > 1) {
-                    Block criticalBlock = new Block("criticalBlock",block.getFunction());
+                    Block criticalBlock = new Block("criticalBlock", block.getFunction());
                     block.getFunction().registerBlockName(criticalBlock.getName(), criticalBlock);
                     BranchInst branch = new BranchInst(criticalBlock, null, block, null);
                     parallelCopyInst = new ParallelCopyInst(criticalBlock);
@@ -103,7 +103,7 @@ public class SSADestructor extends IRPass {
 
     private void parallelCopy2move(Block block) {
         ParallelCopyInst parallelCopy = block.getParallelCopy();
-        if (parallelCopy != null){
+        if (parallelCopy != null) {
             ArrayList<MoveInst> moves = new ArrayList<>();
             while (!parallelCopy.getMoves().isEmpty()) {
                 MoveInst move = parallelCopy.findValidMove();

@@ -1,7 +1,10 @@
 package Optimization;
 
 import IR.Block;
-import IR.Instruction.*;
+import IR.Instruction.BranchInst;
+import IR.Instruction.CallInst;
+import IR.Instruction.LLVMInstruction;
+import IR.Instruction.ReturnInst;
 import IR.LLVMfunction;
 import IR.LLVMoperand.Operand;
 import IR.LLVMoperand.Register;
@@ -11,13 +14,13 @@ import Utility.Pair;
 
 import java.util.*;
 
-public class InlineExpansion extends IRPass {
-    private final int instructionLimit = 100;
-    private final int inlineDepth = 4;
+public class Inline extends IRPass {
+    private final int instructionLimit = 400;
+    private final int inlineDepth = 5;
     private Map<LLVMfunction, Integer> instructionCount;
     private Map<LLVMfunction, Set<LLVMfunction>> recursiveCalleeMap;
 
-    public InlineExpansion(Module module) {
+    public Inline(Module module) {
         super(module);
         instructionCount = new HashMap<>();
         recursiveCalleeMap = new HashMap<>();
@@ -25,22 +28,22 @@ public class InlineExpansion extends IRPass {
 
     @Override
     public boolean run() {
-        if(!module.checkNormalFunctional()) return false;
-        if(!module.checkTrivalCall()) return false;
+        if (!module.checkNormalFunctional()) return false;
+        if (!module.checkTrivalCall()) return false;
         initMap();
         changed = false;
-        if(nonRecursiveInline()) changed = true;
-        if(recursiveInline()) changed = true;
+        if (nonRecursiveInline()) changed = true;
+        if (recursiveInline()) changed = true;
         return false;
     }
 
-    public void initMap(){
+    public void initMap() {
         instructionCount = new HashMap<>();
         recursiveCalleeMap = new HashMap<>();
         for (LLVMfunction function : module.getFunctionMap().values())
             recursiveCalleeMap.put(function, new HashSet<>());
 
-        for (LLVMfunction function : module.getFunctionMap().values()){
+        for (LLVMfunction function : module.getFunctionMap().values()) {
             //count instrcutionn in function
             int instructionCount = 0;
             for (Block block : function.getBlocks()) {
@@ -50,7 +53,7 @@ public class InlineExpansion extends IRPass {
                     if (currentInst instanceof CallInst) {
                         CallInst callInst = (CallInst) currentInst;
                         LLVMfunction callee = callInst.getLlvMfunction();
-                        if(module.getFunctionMap().containsValue(callee))
+                        if (module.getFunctionMap().containsValue(callee))
                             recursiveCalleeMap.get(function).add(callee);
                     }
                     currentInst = currentInst.getPostInst();
@@ -58,7 +61,7 @@ public class InlineExpansion extends IRPass {
             }
             this.instructionCount.put(function, instructionCount);
         }
-        for (LLVMfunction function : module.getFunctionMap().values()){
+        for (LLVMfunction function : module.getFunctionMap().values()) {
             //init recursive function relationship
             Queue<LLVMfunction> queue = new LinkedList<>();
             Set<LLVMfunction> callees = recursiveCalleeMap.get(function);

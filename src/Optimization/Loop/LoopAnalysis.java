@@ -102,7 +102,7 @@ public class LoopAnalysis extends IRPass {
         for (Block successor : block.getSuccessors()) {
             if (!visit.contains(successor)) {
                 LoopNode nextLoopNode;
-                if(child != null)
+                if (child != null)
                     nextLoopNode = child;
                 else
                     nextLoopNode = currentLoop;
@@ -181,7 +181,7 @@ public class LoopAnalysis extends IRPass {
         //merge loop with the same header, the result may be not natural loop
         if (!headerLoopNodeMap.containsKey(header))
             headerLoopNodeMap.put(header, loop);
-        else{
+        else {
             LoopNode existingHeader = headerLoopNodeMap.get(header);
             existingHeader.getLoopBlocks().addAll(loop.getLoopBlocks());
         }

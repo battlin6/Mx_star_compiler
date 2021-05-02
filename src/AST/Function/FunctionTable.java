@@ -8,43 +8,44 @@ import java.util.HashMap;
 public class FunctionTable {
     private HashMap<String, Function> globalTable;
     private HashMap<String, Function> methodTable;
-    public FunctionTable(){
+
+    public FunctionTable() {
         globalTable = new HashMap<String, Function>();
         methodTable = null;
     }
 
     public void putFunc(String funcName, Function function) throws CompileError {
-        if(globalTable.containsKey(funcName)){
+        if (globalTable.containsKey(funcName)) {
             throw new CompileError(null, "Duplicate function name");
-        }else{
+        } else {
             globalTable.put(funcName, function);
         }
     }
 
-    public void putMethod(HashMap<String, Function> methodTable){
+    public void putMethod(HashMap<String, Function> methodTable) {
         this.methodTable = methodTable;
     }
 
-    public void clearMethod(){
+    public void clearMethod() {
         this.methodTable = null;
     }
 
-    public boolean hasFunc(String funcName){
-        if(methodTable != null && methodTable.containsKey(funcName)){
+    public boolean hasFunc(String funcName) {
+        if (methodTable != null && methodTable.containsKey(funcName)) {
             return true;
-        }else if(globalTable.containsKey(funcName)){
+        } else if (globalTable.containsKey(funcName)) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
     //Find method in priority
     public Function getFunc(String funcName) throws CompileError {
-        if(!hasFunc(funcName)){
+        if (!hasFunc(funcName)) {
             throw new CompileError(null, "Function name not exist");
-        } else{
-            if(methodTable != null && methodTable.containsKey(funcName))
+        } else {
+            if (methodTable != null && methodTable.containsKey(funcName))
                 return methodTable.get(funcName);
             else
                 return globalTable.get(funcName);

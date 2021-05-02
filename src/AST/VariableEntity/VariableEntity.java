@@ -7,7 +7,8 @@ public class VariableEntity {
     private String id;
     private Type type;
     private Operand allocAddr;
-    public VariableEntity(String id, Type type){
+
+    public VariableEntity(String id, Type type) {
         this.id = id;
         this.type = type;
         allocAddr = null;

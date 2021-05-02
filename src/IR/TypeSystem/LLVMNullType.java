@@ -2,7 +2,7 @@ package IR.TypeSystem;
 
 import IR.LLVMoperand.Operand;
 
-public class LLVMNullType extends LLVMtype{     //not used?
+public class LLVMNullType extends LLVMtype {     //not used?
     @Override
     public String toString() {
         assert false;

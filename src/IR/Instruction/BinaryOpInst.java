@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-public class BinaryOpInst extends LLVMInstruction{
+public class BinaryOpInst extends LLVMInstruction {
     public enum BinaryOpName {
         add, sub, mul, sdiv, srem,          // Binary Operations
         shl, ashr, and, or, xor             // Bitwise Binary Operations
@@ -49,12 +49,12 @@ public class BinaryOpInst extends LLVMInstruction{
 
     @Override
     public void overrideObject(Object oldUse, Object newUse) {
-        if(lhs == oldUse){
+        if (lhs == oldUse) {
             lhs.removeUse(this);
             lhs = (Operand) newUse;
             lhs.addUse(this);
         }
-        if(rhs == oldUse){
+        if (rhs == oldUse) {
             rhs.removeUse(this);
             rhs = (Operand) newUse;
             rhs.addUse(this);
@@ -150,7 +150,7 @@ public class BinaryOpInst extends LLVMInstruction{
 
     @Override
     public LLVMInstruction makeCopy() {
-        BinaryOpInst binaryOpInst =  new BinaryOpInst(this.getBlock(), this.op, this.lhs, this.rhs, this.result);
+        BinaryOpInst binaryOpInst = new BinaryOpInst(this.getBlock(), this.op, this.lhs, this.rhs, this.result);
         binaryOpInst.result.setDef(binaryOpInst);
         return binaryOpInst;
     }

@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-public class LoadInst extends LLVMInstruction{
+public class LoadInst extends LLVMInstruction {
     private Operand addr;
     private Register result;
 
@@ -39,7 +39,7 @@ public class LoadInst extends LLVMInstruction{
 
     @Override
     public void overrideObject(Object oldUse, Object newUse) {
-        if(addr == oldUse){
+        if (addr == oldUse) {
             addr.removeUse(this);
             addr = (Operand) newUse;
             addr.addUse(this);
@@ -77,7 +77,7 @@ public class LoadInst extends LLVMInstruction{
             return false;
     }
 
-    public LLVMtype getType(){
+    public LLVMtype getType() {
         return result.getLlvMtype();
     }
 

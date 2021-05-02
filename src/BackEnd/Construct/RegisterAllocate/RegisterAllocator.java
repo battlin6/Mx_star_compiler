@@ -1,6 +1,7 @@
 package BackEnd.Construct.RegisterAllocate;
 
 import BackEnd.ASMBlock;
+import BackEnd.ASMFunction;
 import BackEnd.ASMModule;
 import BackEnd.Construct.ASMPass;
 import BackEnd.Construct.LivenessAnalysis;
@@ -10,14 +11,13 @@ import BackEnd.Operand.ASMRegister.PhysicalASMRegister;
 import BackEnd.Operand.ASMRegister.VirtualASMRegister;
 import BackEnd.Operand.Address.StackLocation;
 import BackEnd.Operand.Immediate.IntImmediate;
-import BackEnd.ASMFunction;
 import IR.Module;
 import Optimization.Loop.LoopAnalysis;
 
 import java.util.*;
 
 public class RegisterAllocator extends ASMPass {
-    final static int inf = 99999999;
+    final static int inf = 99999997;
     final private int K = PhysicalASMRegister.allocatablePRs.size();
 
     private ASMFunction ASMFunction;
@@ -28,6 +28,7 @@ public class RegisterAllocator extends ASMPass {
         super(ASMModule);
         this.loopAnalysis = new LoopAnalysis(module);
     }
+
     private Set<VirtualASMRegister> preColoredNode;
     private Set<VirtualASMRegister> initial;
     private Set<VirtualASMRegister> simplifyWorkList;
@@ -53,7 +54,7 @@ public class RegisterAllocator extends ASMPass {
             GraphColoring(ASMFunction);
     }
 
-    private boolean shouldAssignColor(){
+    private boolean shouldAssignColor() {
         return simplifyWorkList.isEmpty() && workListMoves.isEmpty()
                 && freezeWorkList.isEmpty() && spillWorkList.isEmpty();
     }

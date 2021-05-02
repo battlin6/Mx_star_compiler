@@ -12,7 +12,7 @@ public class DCE extends IRPass {
 
     private SideEffectChecker sideEffectChecker;
     private LoopAnalysis loopAnalysis;
-    private Map<LLVMfunction, Set<LLVMInstruction>>liveInstsSet;
+    private Map<LLVMfunction, Set<LLVMInstruction>> liveInstsSet;
 
     public DCE(Module module) {
         super(module);
@@ -22,12 +22,12 @@ public class DCE extends IRPass {
 
     @Override
     public boolean run() {
-        if(!module.checkNormalFunctional()) return false;
+        if (!module.checkNormalFunctional()) return false;
         liveInstsSet = new HashMap<>();
         loopAnalysis.run();
         sideEffectChecker.run();
         changed = false;
-        for (LLVMfunction function : module.getFunctionMap().values()){
+        for (LLVMfunction function : module.getFunctionMap().values()) {
             liveInstsSet.put(function, new HashSet<LLVMInstruction>());
             roughMarkLiveInst(function);
             changed |= deadCodeElimination(function);
@@ -35,7 +35,7 @@ public class DCE extends IRPass {
         return changed;
     }
 
-    private void roughMarkLiveInst(LLVMfunction function){
+    private void roughMarkLiveInst(LLVMfunction function) {
         Set<LLVMInstruction> liveInsts = liveInstsSet.get(function);
         Queue<LLVMInstruction> queue = new LinkedList<>();
         for (Block block : function.getBlocks())
@@ -59,7 +59,7 @@ public class DCE extends IRPass {
     private boolean deadCodeElimination(LLVMfunction function) {
         Set<LLVMInstruction> liveInsts = liveInstsSet.get(function);
         boolean changed = false;
-        for (Block block : function.getBlocks()){
+        for (Block block : function.getBlocks()) {
             LLVMInstruction currentInst = block.getInstHead();
             while (currentInst != null) {
                 if (!liveInsts.contains(currentInst))
@@ -90,7 +90,7 @@ public class DCE extends IRPass {
                 queue.offer(currentInst);
                 liveBlock = true;
             }
-            if(liveBlock){
+            if (liveBlock) {
                 liveInsts.add(currentInst.getBlock().getInstTail());
                 queue.offer(currentInst.getBlock().getInstTail());
             }

@@ -2,7 +2,7 @@ package IR.LLVMoperand;
 
 import IR.TypeSystem.LLVMtype;
 
-public class ConstString extends Operand implements Constant{
+public class ConstString extends Operand implements Constant {
     private String value;   //the type does not concern?
 
     public ConstString(LLVMtype llvMtype, String value) {

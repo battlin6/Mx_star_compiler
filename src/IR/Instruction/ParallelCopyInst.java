@@ -11,7 +11,7 @@ import Optimization.SideEffectChecker;
 import java.util.*;
 
 //gugu changed can be changed totally
-public class ParallelCopyInst extends LLVMInstruction{
+public class ParallelCopyInst extends LLVMInstruction {
     private HashSet<MoveInst> moves;
 
     public ParallelCopyInst(Block block) {
@@ -39,7 +39,8 @@ public class ParallelCopyInst extends LLVMInstruction{
     }
 
     @Override
-    public void overrideObject(Object oldUse, Object newUse) { }
+    public void overrideObject(Object oldUse, Object newUse) {
+    }
 
     public HashSet<MoveInst> getMoves() {
         return moves;

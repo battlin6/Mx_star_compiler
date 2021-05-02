@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-public class ReturnInst extends LLVMInstruction{
+public class ReturnInst extends LLVMInstruction {
     private LLVMtype returnType;
     private Operand returnValue;
 
@@ -26,7 +26,7 @@ public class ReturnInst extends LLVMInstruction{
 
     @Override
     public String toString() {
-        if(!(returnType instanceof LLVMVoidType))
+        if (!(returnType instanceof LLVMVoidType))
             return "ret " + returnType.toString() + " " + returnValue.toString();
         else
             return "ret " + "void";
@@ -35,13 +35,13 @@ public class ReturnInst extends LLVMInstruction{
     @Override
     public void removeFromBlock() {
         super.removeFromBlock();
-        if(returnValue != null)
+        if (returnValue != null)
             returnValue.removeUse(this);
     }
 
     @Override
     public void overrideObject(Object oldUse, Object newUse) {
-        if(returnValue == oldUse){
+        if (returnValue == oldUse) {
             returnValue.removeUse(this);
             returnValue = (Operand) newUse;
             returnValue.addUse(this);

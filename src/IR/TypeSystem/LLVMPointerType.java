@@ -3,7 +3,7 @@ package IR.TypeSystem;
 import IR.LLVMoperand.ConstNull;
 import IR.LLVMoperand.Operand;
 
-public class LLVMPointerType extends LLVMtype{
+public class LLVMPointerType extends LLVMtype {
     private LLVMtype baseType;
 
     public LLVMPointerType(LLVMtype baseType) {

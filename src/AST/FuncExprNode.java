@@ -17,7 +17,7 @@ public class FuncExprNode extends ExprNode {
         this.paras = paras;
     }
 
-    public ArrayList<ExprNode> getParas(){
+    public ArrayList<ExprNode> getParas() {
         return this.paras;
     }
 

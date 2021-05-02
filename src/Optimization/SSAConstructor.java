@@ -18,7 +18,6 @@ public class SSAConstructor extends IRPass {
     private Map<Block, Map<AllocInst, PhiInst>> phiInstMap;
 
 
-
     private Map<Block, Map<AllocInst, Operand>> renameTable;
 
     public SSAConstructor(Module module) {
@@ -27,7 +26,7 @@ public class SSAConstructor extends IRPass {
 
     @Override
     public boolean run() {
-        if(!module.checkNormalFunctional()) return false;
+        if (!module.checkNormalFunctional()) return false;
         for (LLVMfunction function : module.getFunctionMap().values())
             constructSSA(function);
         return true;
@@ -64,15 +63,15 @@ public class SSAConstructor extends IRPass {
         rename(function.getInitBlock(), null, new HashSet<>());
     }
 
-    void addPhiForVar(AllocInst allocInst){
+    void addPhiForVar(AllocInst allocInst) {
         ArrayList<StoreInst> defs = new ArrayList<>();
         for (LLVMInstruction useInst : allocInst.getResult().getUse().keySet()) {
             if (useInst instanceof LoadInst)
                 useAlloca.put((LoadInst) useInst, allocInst);
-            else if(useInst instanceof StoreInst){
+            else if (useInst instanceof StoreInst) {
                 defs.add((StoreInst) useInst);
                 defAlloca.put((StoreInst) useInst, allocInst);
-            }else{
+            } else {
                 throw new RuntimeException();
             }
         }
@@ -121,11 +120,11 @@ public class SSAConstructor extends IRPass {
         for (AllocInst allocInst : map.keySet()) {
             PhiInst phiInst = map.get(allocInst);
             Operand value;
-            if(renameTable.get(predecessor).containsKey(allocInst)){
+            if (renameTable.get(predecessor).containsKey(allocInst)) {
                 assert renameTable.get(predecessor).get(allocInst) != null;
                 value = renameTable.get(predecessor).get(allocInst);
                 phiInst.addBranch(value, predecessor);
-            }else{
+            } else {
                 throw new RuntimeException();
             }
         }
@@ -155,10 +154,10 @@ public class SSAConstructor extends IRPass {
                 instruction.removeFromBlock();
             } else if (instruction instanceof StoreInst && defAlloca.containsKey(instruction)) {
                 AllocInst allocInst = defAlloca.get(instruction);
-                if (!renameTable.get(block).containsKey(allocInst)){
+                if (!renameTable.get(block).containsKey(allocInst)) {
                     Operand newdef = ((StoreInst) instruction).getValue();
                     renameTable.get(block).put(allocInst, newdef);
-                } else{
+                } else {
                     Operand newdef = ((StoreInst) instruction).getValue();
                     renameTable.get(block).replace(allocInst, newdef);
                 }

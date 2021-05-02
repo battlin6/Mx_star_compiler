@@ -2,7 +2,7 @@ package IR.LLVMoperand;
 
 import IR.TypeSystem.LLVMtype;
 
-public class GlobalVar extends Operand{
+public class GlobalVar extends Operand {
     private String name;
 
     public GlobalVar(LLVMtype llvMtype, String name) {
