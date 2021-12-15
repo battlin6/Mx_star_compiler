@@ -1,7 +1,5 @@
 # Mx* Compiler
 
-+ .g4 complete
-
 Reference:
 + https://github.com/ZYHowell/Yx
 + https://github.com/ZYHowell/Compiler-2021-testcases
